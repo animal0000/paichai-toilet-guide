@@ -52,6 +52,7 @@ html_content = f'''<!DOCTYPE html>
       padding: 16px;
     }}
 
+    /* Header Banner */
     .header {{
       background: linear-gradient(135deg, var(--pc-navy-dark) 0%, var(--pc-navy) 60%, #203A9E 100%);
       border-radius: 20px;
@@ -113,78 +114,7 @@ html_content = f'''<!DOCTYPE html>
       letter-spacing: 0.5px;
     }}
 
-    .summary-grid {{
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }}
-
-    @media (max-width: 640px) {{
-      .summary-grid {{
-        grid-template-columns: 1fr;
-      }}
-    }}
-
-    .summary-card {{
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s;
-    }}
-
-    .summary-card:hover {{
-      transform: translateY(-2px);
-      border-color: var(--pc-gold);
-    }}
-
-    .summary-card.primary {{
-      border-color: rgba(30, 144, 255, 0.6);
-      background: linear-gradient(180deg, rgba(30, 144, 255, 0.15) 0%, var(--card-bg) 100%);
-    }}
-
-    .summary-card.highlight {{
-      border-color: rgba(243, 156, 18, 0.6);
-      background: linear-gradient(180deg, rgba(243, 156, 18, 0.15) 0%, var(--card-bg) 100%);
-    }}
-
-    .summary-card.accent {{
-      border-color: rgba(39, 174, 96, 0.6);
-      background: linear-gradient(180deg, rgba(39, 174, 96, 0.15) 0%, var(--card-bg) 100%);
-    }}
-
-    .card-label {{
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }}
-
-    .summary-card.primary .card-label {{ color: var(--pc-blue); }}
-    .summary-card.highlight .card-label {{ color: var(--pc-gold); }}
-    .summary-card.accent .card-label {{ color: var(--pc-green); }}
-
-    .card-value {{
-      font-size: 18px;
-      font-weight: 800;
-      color: white;
-      line-height: 1.3;
-    }}
-
-    .card-desc {{
-      font-size: 12px;
-      color: var(--text-muted);
-    }}
-
+    /* Section Header */
     .section-title {{
       font-size: 18px;
       font-weight: 800;
@@ -204,216 +134,14 @@ html_content = f'''<!DOCTYPE html>
       border-radius: 2px;
     }}
 
-    .tab-bar {{
-      display: flex;
-      background: var(--card-bg);
-      padding: 4px;
-      border-radius: 12px;
-      border: 1px solid var(--card-border);
-      margin-bottom: 14px;
-      gap: 4px;
-    }}
-
-    .tab-btn {{
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s;
-      font-family: inherit;
-    }}
-
-    .tab-btn.active {{
-      background: var(--pc-navy);
-      color: white;
-      box-shadow: 0 4px 12px rgba(26, 47, 138, 0.4);
-      border: 1px solid rgba(243, 156, 18, 0.3);
-    }}
-
-    .view-card {{
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      overflow: hidden;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    }}
-
-    .image-wrapper {{
-      position: relative;
-      width: 100%;
-      background: #000;
-      cursor: pointer;
-    }}
-
-    .image-wrapper img {{
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: transform 0.3s;
-    }}
-
-    .image-wrapper:hover img {{
-      transform: scale(1.01);
-    }}
-
-    .zoom-hint {{
-      position: absolute;
-      bottom: 12px;
-      right: 12px;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(4px);
-      color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 10px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      pointer-events: none;
-    }}
-
-    .view-caption {{
-      padding: 16px;
-      background: #0D1424;
-      border-top: 1px solid var(--card-border);
-    }}
-
-    .caption-title {{
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--pc-gold);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }}
-
-    .caption-text {{
-      font-size: 13px;
-      color: #CBD5E1;
-      line-height: 1.5;
-    }}
-
-    .dual-grid {{
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-    }}
-
-    @media (max-width: 768px) {{
-      .dual-grid {{
-        grid-template-columns: 1fr;
-      }}
-    }}
-
-    .timeline {{
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 20px 16px;
-      margin-bottom: 20px;
-    }}
-
-    .timeline-item {{
-      display: flex;
-      gap: 14px;
-      position: relative;
-      padding-bottom: 22px;
-    }}
-
-    .timeline-item:last-child {{
-      padding-bottom: 0;
-    }}
-
-    .timeline-item::before {{
-      content: '';
-      position: absolute;
-      top: 32px;
-      left: 17px;
-      bottom: 0;
-      width: 2px;
-      background: var(--card-border);
-    }}
-
-    .timeline-item:last-child::before {{
-      display: none;
-    }}
-
-    .step-num {{
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--pc-navy);
-      border: 2px solid var(--pc-gold);
-      color: white;
-      font-size: 14px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      z-index: 1;
-    }}
-
-    .timeline-item.active .step-num {{
-      background: var(--pc-blue);
-      border-color: white;
-      box-shadow: 0 0 12px rgba(30, 144, 255, 0.6);
-    }}
-
-    .step-content {{
-      flex: 1;
-      padding-top: 4px;
-    }}
-
-    .step-title {{
-      font-size: 15px;
-      font-weight: 800;
-      color: white;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }}
-
-    .step-tag {{
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 700;
-      background: rgba(243, 156, 18, 0.2);
-      color: var(--pc-gold);
-    }}
-
-    .step-desc {{
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }}
-
-    .step-desc strong {{
-      color: #F1F5F9;
-    }}
-
+    /* Motion Graphic Video Showcase (Top Placement) */
     .video-section {{
       background: linear-gradient(180deg, #10192E 0%, #0A0F1D 100%);
       border: 1px solid var(--card-border);
       border-radius: 20px;
       padding: 20px;
       margin-bottom: 24px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }}
 
     .video-header {{
@@ -500,6 +228,286 @@ html_content = f'''<!DOCTYPE html>
       box-shadow: 0 4px 14px rgba(192, 57, 43, 0.5);
     }}
 
+    /* Image Display Section */
+    .tab-bar {{
+      display: flex;
+      background: var(--card-bg);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 14px;
+      gap: 4px;
+    }}
+
+    .tab-btn {{
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }}
+
+    .tab-btn.active {{
+      background: var(--pc-navy);
+      color: white;
+      box-shadow: 0 4px 12px rgba(26, 47, 138, 0.4);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+    }}
+
+    .view-card {{
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }}
+
+    .image-wrapper {{
+      position: relative;
+      width: 100%;
+      background: #000;
+      cursor: pointer;
+    }}
+
+    .image-wrapper img {{
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s;
+    }}
+
+    .image-wrapper:hover img {{
+      transform: scale(1.01);
+    }}
+
+    .zoom-hint {{
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      pointer-events: none;
+    }}
+
+    .view-caption {{
+      padding: 16px;
+      background: #0D1424;
+      border-top: 1px solid var(--card-border);
+    }}
+
+    .caption-title {{
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--pc-gold);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+
+    .caption-text {{
+      font-size: 13px;
+      color: #CBD5E1;
+      line-height: 1.5;
+    }}
+
+    .dual-grid {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }}
+
+    @media (max-width: 768px) {{
+      .dual-grid {{
+        grid-template-columns: 1fr;
+      }}
+    }}
+
+    /* 3-Pillar Summary Cards */
+    .summary-grid {{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }}
+
+    @media (max-width: 640px) {{
+      .summary-grid {{
+        grid-template-columns: 1fr;
+      }}
+    }}
+
+    .summary-card {{
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }}
+
+    .summary-card:hover {{
+      transform: translateY(-2px);
+      border-color: var(--pc-gold);
+    }}
+
+    .summary-card.primary {{
+      border-color: rgba(30, 144, 255, 0.6);
+      background: linear-gradient(180deg, rgba(30, 144, 255, 0.15) 0%, var(--card-bg) 100%);
+    }}
+
+    .summary-card.highlight {{
+      border-color: rgba(243, 156, 18, 0.6);
+      background: linear-gradient(180deg, rgba(243, 156, 18, 0.15) 0%, var(--card-bg) 100%);
+    }}
+
+    .summary-card.accent {{
+      border-color: rgba(39, 174, 96, 0.6);
+      background: linear-gradient(180deg, rgba(39, 174, 96, 0.15) 0%, var(--card-bg) 100%);
+    }}
+
+    .card-label {{
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }}
+
+    .summary-card.primary .card-label {{ color: var(--pc-blue); }}
+    .summary-card.highlight .card-label {{ color: var(--pc-gold); }}
+    .summary-card.accent .card-label {{ color: var(--pc-green); }}
+
+    .card-value {{
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+      line-height: 1.3;
+    }}
+
+    .card-desc {{
+      font-size: 12px;
+      color: var(--text-muted);
+    }}
+
+    /* 4-Step Timeline */
+    .timeline {{
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px 16px;
+      margin-bottom: 24px;
+    }}
+
+    .timeline-item {{
+      display: flex;
+      gap: 14px;
+      position: relative;
+      padding-bottom: 22px;
+    }}
+
+    .timeline-item:last-child {{
+      padding-bottom: 0;
+    }}
+
+    .timeline-item::before {{
+      content: '';
+      position: absolute;
+      top: 32px;
+      left: 17px;
+      bottom: 0;
+      width: 2px;
+      background: var(--card-border);
+    }}
+
+    .timeline-item:last-child::before {{
+      display: none;
+    }}
+
+    .step-num {{
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--pc-navy);
+      border: 2px solid var(--pc-gold);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 1;
+    }}
+
+    .timeline-item.active .step-num {{
+      background: var(--pc-blue);
+      border-color: white;
+      box-shadow: 0 0 12px rgba(30, 144, 255, 0.6);
+    }}
+
+    .step-content {{
+      flex: 1;
+      padding-top: 4px;
+    }}
+
+    .step-title {{
+      font-size: 15px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }}
+
+    .step-tag {{
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      background: rgba(243, 156, 18, 0.2);
+      color: var(--pc-gold);
+    }}
+
+    .step-desc {{
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }}
+
+    .step-desc strong {{
+      color: #F1F5F9;
+    }}
+
+    /* Alert Box */
     .alert-box {{
       background: rgba(192, 57, 43, 0.1);
       border: 1px solid rgba(192, 57, 43, 0.4);
@@ -539,6 +547,7 @@ html_content = f'''<!DOCTYPE html>
       color: var(--pc-gold);
     }}
 
+    /* Footer */
     .footer {{
       text-align: center;
       padding-top: 20px;
@@ -551,6 +560,7 @@ html_content = f'''<!DOCTYPE html>
       color: var(--pc-gold);
     }}
 
+    /* Modal */
     .modal {{
       display: none;
       position: fixed;
@@ -632,6 +642,7 @@ html_content = f'''<!DOCTYPE html>
 
   <div class="container">
 
+    <!-- 1. Header Banner -->
     <header class="header">
       <div class="badge">🔥 2026 배양전 (효창운동장)</div>
       <h1>학생 화장실 이용 동선 안내</h1>
@@ -639,24 +650,35 @@ html_content = f'''<!DOCTYPE html>
       <div class="org">PAICHAI MIDDLE SCHOOL & PAICHAI HIGH SCHOOL</div>
     </header>
 
-    <div class="summary-grid">
-      <div class="summary-card primary">
-        <div class="card-label">📍 목적지 [파란 박스]</div>
-        <div class="card-value">맞은편 B출입구 2층</div>
-        <div class="card-desc">응원석 정면 맞은편 스탠드 B게이트 계단</div>
+    <!-- 2. [최상단 배치 1] 동선 안내 모션그래픽 비디오 (MP4) -->
+    <div class="section-title">동선 안내 모션그래픽 비디오 (MP4)</div>
+    <div class="video-section">
+      <div class="video-header">
+        <div>
+          <span class="video-badge">HD 1080p 공식 모션그래픽</span>
+          <h3 style="font-size: 16px; font-weight: 800; margin-top: 4px;">18초 동선 안내 애니메이션 영상</h3>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted);">카카오톡 / 전광판 공유 최적화</span>
       </div>
-      <div class="summary-card highlight">
-        <div class="card-label">☀️ 랜드마크</div>
-        <div class="card-value">태양광 패널 아래 입구</div>
-        <div class="card-desc">객석에서 보았을 때 태양광 패널 연결 계단</div>
+
+      <div class="video-player-box">
+        <video controls playsinline preload="metadata" poster="data:image/jpeg;base64,{VIEW_B64}">
+          <source src="paichai_toilet_guide.mp4" type="video/mp4">
+          브라우저가 비디오 재생을 지원하지 않습니다. 아래 다운로드 버튼을 이용하세요.
+        </video>
       </div>
-      <div class="summary-card accent">
-        <div class="card-label">👉 내부 동선</div>
-        <div class="card-value">진입 후 【오른쪽 2층】</div>
-        <div class="card-desc">출입문 진입 직후 우측 계단으로 이동</div>
+
+      <div class="dl-btn-group">
+        <a class="btn btn-primary" href="paichai_toilet_guide.mp4" download="배양전_화장실안내_가로형.mp4">
+          📥 가로형 비디오 다운로드 (16:9 PC/전광판)
+        </a>
+        <a class="btn btn-red" href="paichai_toilet_guide_mobile.mp4" download="배양전_화장실안내_모바일.mp4">
+          📱 세로형 비디오 다운로드 (9:16 스마트폰용)
+        </a>
       </div>
     </div>
 
+    <!-- 3. [최상단 배치 2] 시각 동선 가이드 이미지 (조감도 & 현장 실사) -->
     <div class="section-title">시각 동선 가이드 (조감도 & 현장 실사)</div>
 
     <div class="tab-bar">
@@ -720,6 +742,27 @@ html_content = f'''<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- 4. 3-Pillar Summary Cards -->
+    <div class="section-title">핵심 요약 (Quick Summary)</div>
+    <div class="summary-grid">
+      <div class="summary-card primary">
+        <div class="card-label">📍 목적지 [파란 박스]</div>
+        <div class="card-value">맞은편 B출입구 2층</div>
+        <div class="card-desc">응원석 정면 맞은편 스탠드 B게이트 계단</div>
+      </div>
+      <div class="summary-card highlight">
+        <div class="card-label">☀️ 랜드마크</div>
+        <div class="card-value">태양광 패널 아래 입구</div>
+        <div class="card-desc">객석에서 보았을 때 태양광 패널 연결 계단</div>
+      </div>
+      <div class="summary-card accent">
+        <div class="card-label">👉 내부 동선</div>
+        <div class="card-value">진입 후 【오른쪽 2층】</div>
+        <div class="card-desc">출입문 진입 직후 우측 계단으로 이동</div>
+      </div>
+    </div>
+
+    <!-- 5. 4-Step Timeline Guide -->
     <div class="section-title">단계별 행동 요령 (Step-by-Step)</div>
     <div class="timeline">
       <div class="timeline-item">
@@ -775,33 +818,7 @@ html_content = f'''<!DOCTYPE html>
       </div>
     </div>
 
-    <div class="section-title">동선 안내 모션그래픽 비디오 (MP4)</div>
-    <div class="video-section">
-      <div class="video-header">
-        <div>
-          <span class="video-badge">HD 1080p 공식 모션그래픽 (수정본)</span>
-          <h3 style="font-size: 16px; font-weight: 800; margin-top: 4px;">18초 동선 안내 애니메이션 영상</h3>
-        </div>
-        <span style="font-size: 12px; color: var(--text-muted);">카카오톡 / 전광판 공유 최적화</span>
-      </div>
-
-      <div class="video-player-box">
-        <video controls playsinline preload="metadata" poster="data:image/jpeg;base64,{VIEW_B64}">
-          <source src="paichai_toilet_guide.mp4" type="video/mp4">
-          브라우저가 비디오 재생을 지원하지 않습니다. 아래 다운로드 버튼을 이용하세요.
-        </video>
-      </div>
-
-      <div class="dl-btn-group">
-        <a class="btn btn-primary" href="paichai_toilet_guide.mp4" download="배양전_화장실안내_가로형.mp4">
-          📥 가로형 비디오 다운로드 (16:9 PC/전광판)
-        </a>
-        <a class="btn btn-red" href="paichai_toilet_guide_mobile.mp4" download="배양전_화장실안내_모바일.mp4">
-          📱 세로형 비디오 다운로드 (9:16 스마트폰용)
-        </a>
-      </div>
-    </div>
-
+    <!-- 6. Safety Notice Alert -->
     <div class="alert-box">
       <div class="alert-title">⚠️ 배양전 관람 학생 안전 및 질서 수칙</div>
       <ul class="alert-list">
@@ -812,6 +829,7 @@ html_content = f'''<!DOCTYPE html>
       </ul>
     </div>
 
+    <!-- 7. Footer -->
     <footer class="footer">
       <p>배재학당 · 배재중학교 · 배재고등학교 학생회 & 인솔지도부</p>
       <p style="margin-top: 4px;"><strong>PaiChai Hakdang</strong> | Victory PaiChai! All Rights Reserved.</p>
@@ -819,6 +837,7 @@ html_content = f'''<!DOCTYPE html>
 
   </div>
 
+  <!-- Lightbox Modal -->
   <div class="modal" id="imageModal" onclick="closeModal()">
     <button class="modal-close" onclick="closeModal()">✕</button>
     <img class="modal-content" id="modalImg" src="" alt="확대 이미지">
@@ -859,4 +878,4 @@ out_path = 'D:/Antigravity/workspace/paichai_toilet_guide/index.html'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write(html_content)
 
-print(f'index.html updated successfully: {out_path} ({os.path.getsize(out_path)//1024} KB)')
+print(f'index.html rebuilt with TOP Video & Image placement: {out_path} ({os.path.getsize(out_path)//1024} KB)')
