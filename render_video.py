@@ -4,6 +4,9 @@ import subprocess
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+sys.path.append('D:/Antigravity/workspace/paichai_toilet_guide/assets')
+from smooth_path_data import SMOOTH_WAYPOINTS
+
 # 폰트 설정
 FONT_BD = 'C:/Windows/Fonts/malgunbd.ttf'
 FONT_REG = 'C:/Windows/Fonts/malgun.ttf'
@@ -12,7 +15,7 @@ def get_font(size, bold=True):
     path = FONT_BD if bold else FONT_REG
     return ImageFont.truetype(path, size)
 
-# 브랜드 컬러
+# 브랜드 및 고시인성 컬러
 COLOR_NAVY = (26, 47, 138)       # PaiChai Navy #1A2F8A
 COLOR_NAVY_DARK = (15, 28, 85)
 COLOR_RED = (192, 57, 43)        # PaiChai Red #C0392B
@@ -22,21 +25,16 @@ COLOR_DARK = (15, 23, 42)
 COLOR_GREEN = (46, 204, 113)
 COLOR_DOOR_BLUE = (30, 144, 255) # 사용자 지정 출입구 파란 박스
 
+# 고시인성 이동 동선 색상 (네온 옐로우 & 일렉트릭 골드)
+COLOR_PATH_SHADOW = (10, 15, 30)      # 배경 대비용 외곽 섀도우
+COLOR_PATH_NEON = (255, 230, 0)       # 눈에 확 띄는 네온 옐로우 #FFE600
+COLOR_PATH_CORE = (255, 255, 220)     # 중심부 고광도 코어
+
 # 에셋 로드
 im_aerial = Image.open('D:/Antigravity/workspace/paichai_toilet_guide/assets/aerial_route.jpg').convert('RGB')
 im_view = Image.open('D:/Antigravity/workspace/paichai_toilet_guide/assets/view_optimized.jpg').convert('RGB')
 
-WAYPOINTS = [
-    (0.64, 0.76),
-    (0.72, 0.74),
-    (0.82, 0.70),
-    (0.88, 0.63),
-    (0.91, 0.54),
-    (0.89, 0.45),
-    (0.83, 0.40),
-    (0.75, 0.38),
-    (0.66, 0.37)
-]
+WAYPOINTS = SMOOTH_WAYPOINTS
 
 def interpolate_path(t):
     n = len(WAYPOINTS) - 1
@@ -74,14 +72,14 @@ def render_frame_landscape(t, total_time=18.0):
         draw.rounded_rectangle([cx, cy, cx + card_w, cy + card_h], radius=24, fill=(15, 23, 42), outline=COLOR_GOLD, width=3)
 
         draw.text((w//2, cy + 65), '📍 목적지: 응원석 맞은편 B출입구 2층', font=get_font(36), fill=COLOR_GOLD, anchor='mm')
-        draw.text((w//2, cy + 135), '☀️ 랜드마크: 지붕 위 태양광 패널 아래 파란 박스', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, cy + 135), '☀️ 랜드마크: 지붕 위 태양광 패널 아래 [파란 박스 계단]', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
         draw.text((w//2, cy + 200), '👉 출입구 진입 후 【 오른쪽 2층 】 화장실', font=get_font(30), fill=COLOR_GREEN, anchor='mm')
 
         draw.text((w//2, 880), 'PaiChai Middle & High School', font=get_font(26), fill=(200, 215, 255), anchor='mm')
         draw.text((w//2, 925), '승리의 배재! 안전하고 질서 있는 관람을 응원합니다', font=get_font(22, False), fill=(180, 195, 230), anchor='mm')
 
     elif t < 9.0:
-        # [SCENE 2: 항공 지도 동선]
+        # [SCENE 2: 항공 지도 동선 - 원본 녹색선을 매끄럽게 타는 네온 옐로우 라인]
         st = t - 3.5
         zoom = 1.0 + (st / 5.5) * 0.12
         aw, ah = im_aerial.size
@@ -103,22 +101,41 @@ def render_frame_landscape(t, total_time=18.0):
             rel_y = (gy * ah - y1) / ch
             return (int(60 + rel_x * map_w), int(60 + rel_y * map_h))
 
+        # 매끄러운 궤적 드로잉 (st: 0.6s ~ 3.6s)
         prog = min(1.0, max(0.0, (st - 0.6) / 3.0))
         if prog > 0:
-            num_pts = int(prog * 100)
-            pts = [to_screen(*interpolate_path(i / 100.0)) for i in range(num_pts + 1)]
-            for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=(46, 204, 113), width=10)
-            head = pts[-1]
-            draw.ellipse([head[0]-16, head[1]-16, head[0]+16, head[1]+16], fill=(255, 255, 255), outline=(46, 204, 113), width=4)
+            num_pts = int(prog * len(WAYPOINTS))
+            num_pts = max(1, min(len(WAYPOINTS) - 1, num_pts))
+            pts = [to_screen(*WAYPOINTS[i]) for i in range(num_pts + 1)]
 
-        start_pt = to_screen(0.64, 0.76)
+            # 1) 어두운 배경 섀도우 라인 (대비 강화)
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=16)
+
+            # 2) 메인 고시인성 네온 옐로우 라인
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=10)
+
+            # 3) 중심 하이라이트 코어
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=3)
+
+            # 4) 전진하는 헤드 포인터 (이중 펄스 링)
+            head = pts[-1]
+            pulse_sz = 14 + int((st * 8) % 4) * 2
+            draw.ellipse([head[0]-pulse_sz-4, head[1]-pulse_sz-4, head[0]+pulse_sz+4, head[1]+pulse_sz+4], fill=COLOR_PATH_SHADOW)
+            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
+            draw.ellipse([head[0]-5, head[1]-5, head[0]+5, head[1]+5], fill=COLOR_WHITE)
+
+        # 출발지 핀 (배재 응원석)
+        start_pt = to_screen(WAYPOINTS[0][0], WAYPOINTS[0][1])
         draw.ellipse([start_pt[0]-18, start_pt[1]-18, start_pt[0]+18, start_pt[1]+18], fill=COLOR_NAVY, outline=COLOR_WHITE, width=3)
         draw.rounded_rectangle([start_pt[0]-90, start_pt[1]+24, start_pt[0]+90, start_pt[1]+60], radius=8, fill=COLOR_NAVY)
         draw.text((start_pt[0], start_pt[1]+42), '출발: 배재 응원석', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
 
+        # 도착지 핀 (맞은편 B출입구)
         if st > 2.2:
-            dest_pt = to_screen(0.66, 0.37)
+            dest_pt = to_screen(WAYPOINTS[-1][0], WAYPOINTS[-1][1])
             pulse_r = 20 + int((st * 5) % 3) * 8
             draw.ellipse([dest_pt[0]-pulse_r, dest_pt[1]-pulse_r, dest_pt[0]+pulse_r, dest_pt[1]+pulse_r], outline=COLOR_RED, width=3)
             draw.ellipse([dest_pt[0]-18, dest_pt[1]-18, dest_pt[0]+18, dest_pt[1]+18], fill=COLOR_RED, outline=COLOR_WHITE, width=3)
@@ -149,13 +166,12 @@ def render_frame_landscape(t, total_time=18.0):
         draw.text((px + 290, 960), '※ 경기장 필드 잔디 진입 절대 금지', font=get_font(18), fill=(255, 120, 120), anchor='mm')
 
     elif t < 14.5:
-        # [SCENE 3: 현장 실사 뷰 - 출입구는 파란 박스 위치]
+        # [SCENE 3: 현장 실사 뷰 - 파란 박스 위치 (cx=240, cy=580)]
         st = t - 9.0
         vw, vh = im_view.size
-        # 출입구(파란 박스 중심: cx=240, cy=580) 쪽으로 포커싱 줌인
         zoom = 1.0 + (st / 5.5) * 0.45
         cw, ch = int(vw / zoom), int(vh / zoom)
-        cx = int(240 + (1.0 - (st / 5.5)) * 100) # 서서히 파란 박스 쪽으로 카메라 팬
+        cx = int(240 + (1.0 - (st / 5.5)) * 100)
         cy = int(580)
         x1 = max(0, min(vw - cw, cx - cw // 2))
         y1 = max(0, min(vh - ch, cy - ch // 2))
@@ -172,21 +188,17 @@ def render_frame_landscape(t, total_time=18.0):
             rel_y = (gy - y1) / ch
             return (int(60 + rel_x * view_w), int(60 + rel_y * view_h))
 
-        # 사용자 지정 파란 박스 정확한 위치: x: 130~350, y: 450~720
         p1 = to_view_screen(130, 450)
         p2 = to_view_screen(350, 720)
 
-        # 파란 박스 하이라이트 (깜빡임 애니메이션)
         pulse_col = COLOR_DOOR_BLUE if int(st * 4) % 2 == 0 else (255, 255, 255)
         draw.rectangle([p1[0]-4, p1[1]-4, p2[0]+4, p2[1]+4], outline=(26, 115, 232), width=2)
         draw.rectangle([p1[0], p1[1], p2[0], p2[1]], outline=pulse_col, width=7)
 
-        # 뱃지: 파란 박스 바로 위
         bx_mid = (p1[0] + p2[0]) // 2
         draw.rounded_rectangle([bx_mid - 120, p1[1] - 50, bx_mid + 120, p1[1] - 10], radius=10, fill=COLOR_DOOR_BLUE)
         draw.text((bx_mid, p1[1] - 30), 'B출입구 (진입 계단)', font=get_font(20), fill=COLOR_WHITE, anchor='mm')
 
-        # 가이드 말풍선 카드 (박스 우측 또는 상단에 배치)
         if st > 0.6:
             card_x = min(p2[0] + 30, 60 + view_w - 520)
             card_y = max(80, p1[1] - 20)
@@ -194,7 +206,6 @@ def render_frame_landscape(t, total_time=18.0):
             card_h = 170
 
             draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=16, fill=(15, 23, 42), outline=COLOR_DOOR_BLUE, width=3)
-            # 포인터 선
             draw.line([(card_x, card_y + 40), (p2[0] + 5, p1[1] + 40)], fill=COLOR_DOOR_BLUE, width=4)
 
             draw.text((card_x + card_w//2, card_y + 35), '📍 B출입구 [파란 박스]', font=get_font(26), fill=COLOR_GOLD, anchor='mm')
@@ -319,20 +330,30 @@ def render_frame_portrait(t, total_time=18.0):
 
         prog = min(1.0, max(0.0, (st - 0.6) / 3.0))
         if prog > 0:
-            num_pts = int(prog * 100)
-            pts = [to_portrait_map(*interpolate_path(i / 100.0)) for i in range(num_pts + 1)]
-            for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=(46, 204, 113), width=10)
-            head = pts[-1]
-            draw.ellipse([head[0]-16, head[1]-16, head[0]+16, head[1]+16], fill=(255, 255, 255), outline=(46, 204, 113), width=4)
+            num_pts = int(prog * len(WAYPOINTS))
+            num_pts = max(1, min(len(WAYPOINTS) - 1, num_pts))
+            pts = [to_portrait_map(*WAYPOINTS[i]) for i in range(num_pts + 1)]
 
-        start_pt = to_portrait_map(0.64, 0.76)
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=16)
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=10)
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=3)
+
+            head = pts[-1]
+            pulse_sz = 14 + int((st * 8) % 4) * 2
+            draw.ellipse([head[0]-pulse_sz-4, head[1]-pulse_sz-4, head[0]+pulse_sz+4, head[1]+pulse_sz+4], fill=COLOR_PATH_SHADOW)
+            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
+            draw.ellipse([head[0]-5, head[1]-5, head[0]+5, head[1]+5], fill=COLOR_WHITE)
+
+        start_pt = to_portrait_map(WAYPOINTS[0][0], WAYPOINTS[0][1])
         draw.ellipse([start_pt[0]-16, start_pt[1]-16, start_pt[0]+16, start_pt[1]+16], fill=COLOR_NAVY, outline=COLOR_WHITE, width=3)
         draw.rounded_rectangle([start_pt[0]-80, start_pt[1]+20, start_pt[0]+80, start_pt[1]+55], radius=8, fill=COLOR_NAVY)
         draw.text((start_pt[0], start_pt[1]+37), '배재 응원석', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
 
         if st > 2.2:
-            dest_pt = to_portrait_map(0.66, 0.37)
+            dest_pt = to_portrait_map(WAYPOINTS[-1][0], WAYPOINTS[-1][1])
             draw.ellipse([dest_pt[0]-18, dest_pt[1]-18, dest_pt[0]+18, dest_pt[1]+18], fill=COLOR_RED, outline=COLOR_WHITE, width=3)
             draw.rounded_rectangle([dest_pt[0]-120, dest_pt[1]-65, dest_pt[0]+120, dest_pt[1]-20], radius=10, fill=COLOR_RED)
             draw.text((dest_pt[0], dest_pt[1]-42), 'B출입구 2층 화장실', font=get_font(18), fill=COLOR_WHITE, anchor='mm')

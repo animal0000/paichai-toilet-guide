@@ -11,3 +11,6 @@ assets/patch_*.jpg
 assets/user_*.jpg
 assets/view_with_grid.jpg
 assets/view_from_seats_fixed.jpg
+
+assets/*mask*.jpg
+assets/test_*.jpg

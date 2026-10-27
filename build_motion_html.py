@@ -1,8 +1,13 @@
 import os
 import sys
+import json
 
 sys.path.append('D:/Antigravity/workspace/paichai_toilet_guide/assets')
 from images_b64 import AERIAL_B64, VIEW_B64
+from smooth_path_data import SMOOTH_WAYPOINTS
+
+pts_js = [{'x': pt[0], 'y': pt[1]} for pt in SMOOTH_WAYPOINTS]
+pts_json_str = json.dumps(pts_js)
 
 html_code = f'''<!DOCTYPE html>
 <html lang="ko">
@@ -17,6 +22,7 @@ html_code = f'''<!DOCTYPE html>
       --pc-red: #C0392B;
       --pc-gold: #F39C12;
       --pc-blue: #1E90FF;
+      --pc-neon: #FFE600;
       --bg: #0A0F1D;
     }}
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -88,7 +94,7 @@ html_code = f'''<!DOCTYPE html>
     .progress-fill {{
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--pc-navy), var(--pc-blue), var(--pc-red));
+      background: linear-gradient(90deg, var(--pc-navy), var(--pc-neon), var(--pc-red));
       border-radius: 4px;
       transition: width 0.05s linear;
     }}
@@ -158,7 +164,7 @@ html_code = f'''<!DOCTYPE html>
     <div class="player-header">
       <div class="title-box">
         <h2>2026 배양전 학생 화장실 이용 동선 안내</h2>
-        <p>효창운동장 B출입구 2층 화장실 (파란 박스 출입구 안내)</p>
+        <p>효창운동장 B출입구 2층 화장실 (실시간 인터랙티브 모션그래픽)</p>
       </div>
       <a href="index.html" class="control-btn" style="text-decoration: none;">📄 안내 문서로 가기</a>
     </div>
@@ -202,31 +208,8 @@ html_code = f'''<!DOCTYPE html>
     const imgView = new Image();
     imgView.src = "data:image/jpeg;base64,{VIEW_B64}";
 
-    const WAYPOINTS = [
-      {{x: 0.64, y: 0.76}},
-      {{x: 0.72, y: 0.74}},
-      {{x: 0.82, y: 0.70}},
-      {{x: 0.88, y: 0.63}},
-      {{x: 0.91, y: 0.54}},
-      {{x: 0.89, y: 0.45}},
-      {{x: 0.83, y: 0.40}},
-      {{x: 0.75, y: 0.38}},
-      {{x: 0.66, y: 0.37}}
-    ];
-
-    function interpPath(t) {{
-      const n = WAYPOINTS.length - 1;
-      const idx = t * n;
-      const i = Math.floor(idx);
-      if (i >= n) return WAYPOINTS[n];
-      const frac = idx - i;
-      const p1 = WAYPOINTS[i];
-      const p2 = WAYPOINTS[i+1];
-      return {{
-        x: p1.x + (p2.x - p1.x) * frac,
-        y: p1.y + (p2.y - p1.y) * frac
-      }};
-    }}
+    // 원본 녹색선을 100% 추적하는 171개 정밀 스무스 웨이포인트
+    const WAYPOINTS = {pts_json_str};
 
     function draw(t) {{
       const w = 1920, h = 1080;
@@ -276,6 +259,7 @@ html_code = f'''<!DOCTYPE html>
         ctx.fillText('PaiChai Middle & High School', w/2, 880);
       }}
       else if (t < 9.0) {{
+        // Scene 2: 항공뷰 부드러운 동선 드로잉
         const st = t - 3.5;
         const zoom = 1.0 + (st / 5.5) * 0.12;
         const aw = imgAerial.width || 948;
@@ -300,32 +284,68 @@ html_code = f'''<!DOCTYPE html>
           return {{ x: 60 + rx * mapW, y: 60 + ry * mapH }};
         }}
 
+        // 초정밀 스무스 네온 라인 드로잉
         const prog = Math.min(1.0, Math.max(0.0, (st - 0.6) / 3.0));
         if (prog > 0) {{
-          const numPts = Math.floor(prog * 100);
+          const numPts = Math.min(WAYPOINTS.length - 1, Math.max(1, Math.floor(prog * WAYPOINTS.length)));
+          
+          // 1) 그림자 라인
           ctx.beginPath();
-          ctx.strokeStyle = '#2ECC71';
-          ctx.lineWidth = 10;
+          ctx.strokeStyle = 'rgba(15, 23, 42, 0.8)';
+          ctx.lineWidth = 16;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           for (let i = 0; i <= numPts; i++) {{
-            const pt = toScreen(interpPath(i / 100).x, interpPath(i / 100).y);
+            const pt = toScreen(WAYPOINTS[i].x, WAYPOINTS[i].y);
             if (i === 0) ctx.moveTo(pt.x, pt.y);
             else ctx.lineTo(pt.x, pt.y);
           }}
           ctx.stroke();
 
-          const head = toScreen(interpPath(prog).x, interpPath(prog).y);
-          ctx.fillStyle = '#FFFFFF';
-          ctx.strokeStyle = '#2ECC71';
-          ctx.lineWidth = 4;
+          // 2) 고시인성 네온 옐로우 라인
           ctx.beginPath();
-          ctx.arc(head.x, head.y, 16, 0, Math.PI * 2);
+          ctx.strokeStyle = '#FFE600';
+          ctx.lineWidth = 10;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          for (let i = 0; i <= numPts; i++) {{
+            const pt = toScreen(WAYPOINTS[i].x, WAYPOINTS[i].y);
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }}
+          ctx.stroke();
+
+          // 3) 중심 하이라이트 코어
+          ctx.beginPath();
+          ctx.strokeStyle = '#FFFFDD';
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          for (let i = 0; i <= numPts; i++) {{
+            const pt = toScreen(WAYPOINTS[i].x, WAYPOINTS[i].y);
+            if (i === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }}
+          ctx.stroke();
+
+          // 4) 전진 헤드 펄스
+          const head = toScreen(WAYPOINTS[numPts].x, WAYPOINTS[numPts].y);
+          ctx.fillStyle = '#0F172A';
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, 18, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#FFE600';
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, 14, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
         }}
 
-        const startPt = toScreen(0.64, 0.76);
+        // 출발 핀
+        const startPt = toScreen(WAYPOINTS[0].x, WAYPOINTS[0].y);
         ctx.fillStyle = '#1A2F8A';
         ctx.beginPath();
         ctx.arc(startPt.x, startPt.y, 18, 0, Math.PI * 2);
@@ -342,8 +362,9 @@ html_code = f'''<!DOCTYPE html>
         ctx.textAlign = 'center';
         ctx.fillText('출발: 배재 응원석', startPt.x, startPt.y + 48);
 
+        // 도착 핀
         if (st > 2.2) {{
-          const destPt = toScreen(0.66, 0.37);
+          const destPt = toScreen(WAYPOINTS[WAYPOINTS.length - 1].x, WAYPOINTS[WAYPOINTS.length - 1].y);
           ctx.fillStyle = '#C0392B';
           ctx.beginPath();
           ctx.arc(destPt.x, destPt.y, 18, 0, Math.PI * 2);
@@ -423,7 +444,6 @@ html_code = f'''<!DOCTYPE html>
           return {{ x: 60 + rx * viewW, y: 60 + ry * viewH }};
         }}
 
-        // 파란 박스 좌표 (130, 450) ~ (350, 720)
         const p1 = toViewScreen(130, 450);
         const p2 = toViewScreen(350, 720);
         ctx.strokeStyle = Math.floor(st * 4) % 2 === 0 ? '#1E90FF' : '#FFFFFF';
@@ -522,7 +542,7 @@ html_code = f'''<!DOCTYPE html>
         const summaries = [
           ['1️⃣ 위치 확인', '맞은편 B출입구 2층', '응원석 맞은편 [파란 박스]\nB출입구 계단으로 진입합니다', '#1E90FF'],
           ['2️⃣ 랜드마크', '태양광 패널 아래 계단', '객석에서 보았을 때\n태양광 패널 지붕 아래 입구 확인', '#F39C12'],
-          ['3️⃣ 진입 후 동선', '오른쪽 2층으로 이동', '출입문 진입 직후\n반드시 우측 2층으로 가세요', '#2ECC71']
+          ['3️⃣ 진입 후 동선', '오른쪽 2층으로 이동', '출입문 진입 직후\n반드시 우측 2층 계단 이용', '#2ECC71']
         ];
 
         summaries.forEach((s, i) => {{
@@ -644,4 +664,4 @@ out_path = 'D:/Antigravity/workspace/paichai_toilet_guide/motion_graphic.html'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write(html_code)
 
-print(f'Motion graphic HTML updated: {out_path} ({os.path.getsize(out_path)//1024} KB)')
+print(f'motion_graphic.html updated with 171 smooth waypoints: {out_path} ({os.path.getsize(out_path)//1024} KB)')
