@@ -1,21 +1,23 @@
 import base64
-from PIL import Image
+import os
 
-def optimize_and_encode(in_path, out_path, max_dim=1200, q=82):
-    im = Image.open(in_path)
-    w, h = im.size
-    scale = min(1.0, max_dim / max(w, h))
-    if scale < 1.0:
-        im = im.resize((int(w * scale), int(h * scale)), Image.Resampling.LANCZOS)
-    im.save(out_path, format='JPEG', quality=q, optimize=True)
-    with open(out_path, 'rb') as f:
-        b64 = base64.b64encode(f.read()).decode('utf-8')
-    print(f'{out_path} size: {len(b64)*3//4//1024} KB')
-    return b64
+ASSETS = 'D:/Antigravity/workspace/paichai_toilet_guide/assets'
 
-b1 = optimize_and_encode('D:/Antigravity/workspace/paichai_toilet_guide/assets/aerial_annotated.jpg', 'D:/Antigravity/workspace/paichai_toilet_guide/assets/aerial_web.jpg')
-b2 = optimize_and_encode('D:/Antigravity/workspace/paichai_toilet_guide/assets/view_annotated.jpg', 'D:/Antigravity/workspace/paichai_toilet_guide/assets/view_web.jpg')
+def get_b64(fname):
+    p = os.path.join(ASSETS, fname)
+    with open(p, 'rb') as f:
+        return base64.b64encode(f.read()).decode('utf-8')
 
-with open('D:/Antigravity/workspace/paichai_toilet_guide/assets/images_b64.py', 'w', encoding='utf-8') as f:
-    f.write(f'AERIAL_B64 = "{b1}"\nVIEW_B64 = "{b2}"\n')
-print('Base64 generated')
+a_b64 = get_b64('aerial_web.jpg')
+v_b64 = get_b64('view_web.jpg')
+n_b64 = get_b64('aerial_annotated_neon.jpg')
+p_b64 = get_b64('poster_motion.jpg')
+
+out_py = os.path.join(ASSETS, 'images_b64.py')
+with open(out_py, 'w', encoding='utf-8') as f:
+    f.write(f'AERIAL_B64 = "{a_b64}"\n')
+    f.write(f'VIEW_B64 = "{v_b64}"\n')
+    f.write(f'AERIAL_NEON_B64 = "{n_b64}"\n')
+    f.write(f'POSTER_B64 = "{p_b64}"\n')
+
+print(f'{out_py} generated successfully with all 4 base64 images.')

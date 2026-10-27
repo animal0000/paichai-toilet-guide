@@ -87,9 +87,9 @@ def render_frame_landscape(t, total_time=18.0):
         cx, cy = w//2 - card_w//2, 470
         draw.rounded_rectangle([cx, cy, cx + card_w, cy + card_h], radius=24, fill=(15, 23, 42), outline=COLOR_GOLD, width=3)
 
-        draw.text((w//2, cy + 65), '📍 목적지: 응원석 맞은편 B출입구 2층', font=get_font(36), fill=COLOR_GOLD, anchor='mm')
-        draw.text((w//2, cy + 135), '☀️ 랜드마크: 지붕 위 태양광 패널 아래 [파란 박스 계단]', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
-        draw.text((w//2, cy + 200), '👉 출입구 진입 후 【 오른쪽 2층 】 화장실', font=get_font(30), fill=COLOR_GREEN, anchor='mm')
+        draw.text((w//2, cy + 65), '목적지: 응원석 맞은편 B출입구 2층', font=get_font(36), fill=COLOR_GOLD, anchor='mm')
+        draw.text((w//2, cy + 135), '랜드마크: 지붕 위 태양광 패널 아래 [파란 박스 계단]', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, cy + 200), '출입구 진입 후 【 오른쪽 2층 】 화장실', font=get_font(30), fill=COLOR_GREEN, anchor='mm')
 
         draw.text((w//2, 880), 'PaiChai Middle & High School', font=get_font(26), fill=(200, 215, 255), anchor='mm')
         draw.text((w//2, 925), '승리의 배재! 안전하고 질서 있는 관람을 응원합니다', font=get_font(22, False), fill=(180, 195, 230), anchor='mm')
@@ -182,11 +182,11 @@ def render_frame_landscape(t, total_time=18.0):
 
             # 7) 헤드를 따라다니는 이동 가이드 뱃지 (Floating Tooltip)
             if prog < 0.98:
-                tip_w, tip_h = 185, 46
+                tip_w, tip_h = 160, 46
                 tx = max(70, min(60 + map_w - tip_w - 10, head[0] - tip_w // 2))
                 ty = max(70, head[1] - 68)
                 draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
-                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 관객석 상단 통로', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
+                draw.text((tx + tip_w//2, ty + tip_h//2), '관객석 상단 통로', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
                 draw.polygon([(head[0], head[1]-16), (head[0]-7, ty+tip_h), (head[0]+7, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         # 출발지 핀 (배재 응원석)
@@ -272,9 +272,9 @@ def render_frame_landscape(t, total_time=18.0):
             draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=16, fill=(15, 23, 42), outline=COLOR_DOOR_BLUE, width=3)
             draw.line([(card_x, card_y + 40), (p2[0] + 5, p1[1] + 40)], fill=COLOR_DOOR_BLUE, width=4)
 
-            draw.text((card_x + card_w//2, card_y + 35), '📍 B출입구 [파란 박스]', font=get_font(26), fill=COLOR_GOLD, anchor='mm')
-            draw.text((card_x + card_w//2, card_y + 78), '☀️ 태양광 패널 아래 출입 계단', font=get_font(21), fill=COLOR_WHITE, anchor='mm')
-            draw.text((card_x + card_w//2, card_y + 122), '👉 진입 후 【오른쪽 2층】 화장실', font=get_font(22), fill=COLOR_GREEN, anchor='mm')
+            draw.text((card_x + card_w//2, card_y + 35), 'B출입구 [파란 박스]', font=get_font(26), fill=COLOR_GOLD, anchor='mm')
+            draw.text((card_x + card_w//2, card_y + 78), '태양광 패널 아래 출입 계단', font=get_font(21), fill=COLOR_WHITE, anchor='mm')
+            draw.text((card_x + card_w//2, card_y + 122), '진입 후 【오른쪽 2층】 화장실', font=get_font(22), fill=COLOR_GREEN, anchor='mm')
 
         px = 1280
         draw.rounded_rectangle([px, 60, w-60, 1020], radius=24, fill=(26, 47, 138), outline=COLOR_GOLD, width=3)
@@ -282,10 +282,10 @@ def render_frame_landscape(t, total_time=18.0):
         draw.text((px + 290, 180), '응원석 시야 실사 뷰', font=get_font(38), fill=COLOR_WHITE, anchor='mm')
 
         points = [
-            ('🟦 파란 박스', '맞은편 스탠드 좌측 태양광 패널 아래 [B출입구 계단]'),
-            ('☀️ 랜드마크', '지붕 위 태양광 패널과 연결된 출입 계단 확인'),
-            ('🚻 화장실 위치', '출입구로 들어간 후 [오른쪽 2층] 화장실로 이동'),
-            ('💡 혼잡 방지 팁', '쉬는 시간 5분 전 또는 경기 진행 중 여유 시 이용 추천')
+            ('파란 박스', '맞은편 스탠드 좌측 태양광 패널 아래 [B출입구 계단]'),
+            ('랜드마크', '지붕 위 태양광 패널과 연결된 출입 계단 확인'),
+            ('화장실 위치', '출입구로 들어간 후 [오른쪽 2층] 화장실로 이동'),
+            ('혼잡 방지 팁', '쉬는 시간 5분 전 또는 경기 진행 중 여유 시 이용 추천')
         ]
         for idx, (title, desc) in enumerate(points):
             iy = 270 + idx * 165
@@ -313,9 +313,9 @@ def render_frame_landscape(t, total_time=18.0):
         start_x = (w - (card_w * 3 + gap * 2)) // 2
 
         summary_cards = [
-            ('1️⃣ 위치 확인', '맞은편 B출입구 2층', '응원석 맞은편 [파란 박스]\nB출입구 계단으로 진입합니다', COLOR_DOOR_BLUE),
-            ('2️⃣ 랜드마크', '태양광 패널 아래 계단', '객석에서 보았을 때\n태양광 패널 지붕 아래 입구 확인', COLOR_GOLD),
-            ('3️⃣ 진입 후 동선', '오른쪽 2층으로 이동', '출입문 진입 직후\n반드시 우측 2층으로 가세요', COLOR_GREEN)
+            ('① 위치 확인', '맞은편 B출입구 2층', '응원석 맞은편 [파란 박스]\nB출입구 계단으로 진입합니다', COLOR_DOOR_BLUE),
+            ('② 랜드마크', '태양광 패널 아래 계단', '객석에서 보았을 때\n태양광 패널 지붕 아래 입구 확인', COLOR_GOLD),
+            ('③ 진입 후 동선', '오른쪽 2층으로 이동', '출입문 진입 직후\n반드시 우측 2층으로 가세요', COLOR_GREEN)
         ]
 
         for i, (head, sub, desc, acc_color) in enumerate(summary_cards):
@@ -329,7 +329,7 @@ def render_frame_landscape(t, total_time=18.0):
                 draw.text((cx + card_w//2, cy + 260 + l_idx * 40), line, font=get_font(22, False), fill=(200, 210, 230), anchor='mm')
 
         draw.rounded_rectangle([w//2 - 450, 750, w//2 + 450, 850], radius=16, fill=COLOR_RED)
-        draw.text((w//2, 800), '🏆 승리의 배재! 안전하고 질서 있는 관람을 응원합니다 🏆', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, 800), '승리의 배재! 안전하고 질서 있는 관람을 응원합니다', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
         draw.text((w//2, 920), 'PaiChai Middle School & PaiChai High School', font=get_font(24), fill=(200, 215, 255), anchor='mm')
 
     return frame
@@ -357,9 +357,9 @@ def render_frame_portrait(t, total_time=18.0):
         cx, cy = w//2 - card_w//2, 740
         draw.rounded_rectangle([cx, cy, cx + card_w, cy + card_h], radius=24, fill=(15, 23, 42), outline=COLOR_GOLD, width=3)
 
-        draw.text((w//2, cy + 90), '📍 목적지: 응원석 맞은편 B출입구 2층', font=get_font(34), fill=COLOR_GOLD, anchor='mm')
-        draw.text((w//2, cy + 200), '☀️ 랜드마크: 태양광 패널 아래 [파란 박스]', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
-        draw.text((w//2, cy + 310), '👉 출입구 진입 후 【 오른쪽 2층 】', font=get_font(32), fill=COLOR_GREEN, anchor='mm')
+        draw.text((w//2, cy + 90), '목적지: 응원석 맞은편 B출입구 2층', font=get_font(34), fill=COLOR_GOLD, anchor='mm')
+        draw.text((w//2, cy + 200), '랜드마크: 태양광 패널 아래 [파란 박스]', font=get_font(30), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, cy + 310), '출입구 진입 후 【 오른쪽 2층 】', font=get_font(32), fill=COLOR_GREEN, anchor='mm')
 
         draw.text((w//2, 1420), 'PaiChai Middle & High School', font=get_font(28), fill=(200, 215, 255), anchor='mm')
         draw.text((w//2, 1470), '승리의 배재! 안전하고 질서 있는 관람', font=get_font(24, False), fill=(180, 195, 230), anchor='mm')
@@ -371,7 +371,7 @@ def render_frame_portrait(t, total_time=18.0):
 
         draw.rounded_rectangle([40, 60, w-40, 180], radius=20, fill=COLOR_NAVY, outline=COLOR_GOLD, width=2)
         draw.text((w//2, 100), 'STEP 1: 효창운동장 전체 이동 동선', font=get_font(34), fill=COLOR_WHITE, anchor='mm')
-        draw.text((w//2, 145), '응원석 ➔ 관객석 상단 통로를 따라 맞은편 B출입구로 이동', font=get_font(22, False), fill=COLOR_GOLD, anchor='mm')
+        draw.text((w//2, 145), '응원석 → 관객석 상단 통로를 따라 맞은편 B출입구로 이동', font=get_font(22, False), fill=COLOR_GOLD, anchor='mm')
 
         map_w, map_h = 1000, 1000
         zoom = 1.0 + (st / 5.5) * 0.15
@@ -452,11 +452,11 @@ def render_frame_portrait(t, total_time=18.0):
 
             # 7) 플로팅 가이드 뱃지
             if prog < 0.98:
-                tip_w, tip_h = 175, 44
+                tip_w, tip_h = 150, 44
                 tx = max(50, min(40 + map_w - tip_w - 10, head[0] - tip_w // 2))
                 ty = max(220, head[1] - 65)
                 draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
-                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 관객석 상단 통로', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
+                draw.text((tx + tip_w//2, ty + tip_h//2), '관객석 상단 통로', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
                 draw.polygon([(head[0], head[1]-16), (head[0]-6, ty+tip_h), (head[0]+6, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         start_pt = to_portrait_map(WAYPOINTS[0][0], WAYPOINTS[0][1])
@@ -525,12 +525,12 @@ def render_frame_portrait(t, total_time=18.0):
         draw.text((bx_mid, p1[1] - 27), 'B출입구 (진입 계단)', font=get_font(18), fill=COLOR_WHITE, anchor='mm')
 
         draw.rounded_rectangle([40, 1240, w-40, 1850], radius=24, fill=COLOR_NAVY, outline=COLOR_GOLD, width=3)
-        draw.text((w//2, 1310), '📍 맞은편 B출입구 2층 화장실', font=get_font(34), fill=COLOR_GOLD, anchor='mm')
-        draw.text((w//2, 1370), '☀️ 지붕 위 태양광 패널 아래 [파란 박스 계단]', font=get_font(26), fill=COLOR_WHITE, anchor='mm')
-        draw.text((w//2, 1430), '👉 출입문 들어가서 【오른쪽 2층】으로 이동', font=get_font(28), fill=COLOR_GREEN, anchor='mm')
+        draw.text((w//2, 1310), '맞은편 B출입구 2층 화장실', font=get_font(34), fill=COLOR_GOLD, anchor='mm')
+        draw.text((w//2, 1370), '지붕 위 태양광 패널 아래 [파란 박스 계단]', font=get_font(26), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, 1430), '출입문 들어가서 【오른쪽 2층】으로 이동', font=get_font(28), fill=COLOR_GREEN, anchor='mm')
 
         draw.rounded_rectangle([70, 1500, w-70, 1780], radius=18, fill=(15, 23, 42))
-        draw.text((100, 1540), '💡 배양전 관람 꿀팁', font=get_font(24), fill=COLOR_GOLD)
+        draw.text((100, 1540), '배양전 관람 꿀팁', font=get_font(24), fill=COLOR_GOLD)
         draw.text((100, 1600), '• 경기 하프타임(쉬는시간)은 매우 혼잡합니다.', font=get_font(20, False), fill=COLOR_WHITE)
         draw.text((100, 1645), '• 쉬는 시간 5분 전 또는 경기 중 이용 권장', font=get_font(20, False), fill=COLOR_WHITE)
         draw.text((100, 1690), '• 상대 학교 응원 구역 침범 금지 및 안전 준수', font=get_font(20, False), fill=COLOR_WHITE)
@@ -543,9 +543,9 @@ def render_frame_portrait(t, total_time=18.0):
         draw.text((w//2, 160), '배양전 학생 화장실 핵심 요약', font=get_font(52), fill=COLOR_WHITE, anchor='mm')
 
         summary_cards = [
-            ('1️⃣ 위치', '맞은편 B출입구 2층', '응원석 맞은편 [파란 박스] 계단으로 진입', COLOR_DOOR_BLUE),
-            ('2️⃣ 랜드마크', '태양광 패널 아래 계단', '객석에서 보았을 때 태양광 패널 지붕 아래 입구 확인', COLOR_GOLD),
-            ('3️⃣ 동선', '진입 후 오른쪽 2층', '출입문 진입 직후 반드시 우측 2층 계단 이용', COLOR_GREEN)
+            ('① 위치', '맞은편 B출입구 2층', '응원석 맞은편 [파란 박스] 계단으로 진입', COLOR_DOOR_BLUE),
+            ('② 랜드마크', '태양광 패널 아래 계단', '객석에서 보았을 때 태양광 패널 지붕 아래 입구 확인', COLOR_GOLD),
+            ('③ 동선', '진입 후 오른쪽 2층', '출입문 진입 직후 반드시 우측 2층 계단 이용', COLOR_GREEN)
         ]
         for i, (head, sub, desc, acc_color) in enumerate(summary_cards):
             cy = 280 + i * 360
@@ -555,7 +555,7 @@ def render_frame_portrait(t, total_time=18.0):
             draw.text((w//2, cy + 225), desc, font=get_font(24, False), fill=(200, 215, 240), anchor='mm')
 
         draw.rounded_rectangle([w//2 - 420, 1420, w//2 + 420, 1560], radius=20, fill=COLOR_RED)
-        draw.text((w//2, 1490), '🏆 승리의 배재! 안전한 관람 🏆', font=get_font(36), fill=COLOR_WHITE, anchor='mm')
+        draw.text((w//2, 1490), '승리의 배재! 안전한 관람', font=get_font(36), fill=COLOR_WHITE, anchor='mm')
         draw.text((w//2, 1660), 'PaiChai Middle School & PaiChai High School', font=get_font(26), fill=(200, 215, 255), anchor='mm')
 
     return frame
