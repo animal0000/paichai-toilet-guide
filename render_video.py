@@ -28,7 +28,7 @@ COLOR_DOOR_BLUE = (30, 144, 255) # 사용자 지정 출입구 파란 박스
 # 고시인성 이동 동선 색상 (네온 옐로우 & 일렉트릭 골드)
 COLOR_PATH_SHADOW = (10, 15, 30)      # 배경 대비용 외곽 섀도우
 COLOR_PATH_NEON = (255, 230, 0)       # 눈에 확 띄는 네온 옐로우 #FFE600
-COLOR_PATH_CORE = (255, 255, 220)     # 중심부 고광도 코어
+COLOR_PATH_CORE = (255, 255, 235)     # 중심부 고광도 코어
 
 # 에셋 로드
 im_aerial = Image.open('D:/Antigravity/workspace/paichai_toilet_guide/assets/aerial_route.jpg').convert('RGB')
@@ -36,16 +36,32 @@ im_view = Image.open('D:/Antigravity/workspace/paichai_toilet_guide/assets/view_
 
 WAYPOINTS = SMOOTH_WAYPOINTS
 
-def interpolate_path(t):
-    n = len(WAYPOINTS) - 1
-    idx = t * n
-    i = int(idx)
-    if i >= n:
-        return WAYPOINTS[-1]
-    frac = idx - i
-    p1 = WAYPOINTS[i]
-    p2 = WAYPOINTS[i+1]
-    return (p1[0] + (p2[0] - p1[0]) * frac, p1[1] + (p2[1] - p1[1]) * frac)
+# 경로 누적 거리 및 정밀 보간 유틸리티
+path_dists = [0.0]
+for _i in range(len(WAYPOINTS) - 1):
+    _p1, _p2 = WAYPOINTS[_i], WAYPOINTS[_i+1]
+    _d = ((_p2[0] - _p1[0])**2 + (_p2[1] - _p1[1])**2)**0.5
+    path_dists.append(path_dists[-1] + _d)
+total_path_dist = path_dists[-1]
+
+def get_path_pos_and_dir(frac):
+    target_d = max(0.0, min(1.0, frac)) * total_path_dist
+    idx = 0
+    while idx < len(path_dists) - 1 and path_dists[idx+1] < target_d:
+        idx += 1
+    if idx >= len(path_dists) - 1:
+        p1 = WAYPOINTS[-2]
+        p2 = WAYPOINTS[-1]
+        dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+        l = (dx*dx + dy*dy)**0.5 or 1.0
+        return WAYPOINTS[-1], (dx/l, dy/l)
+    seg_d = path_dists[idx+1] - path_dists[idx]
+    f = (target_d - path_dists[idx]) / seg_d if seg_d > 0 else 0
+    p1, p2 = WAYPOINTS[idx], WAYPOINTS[idx+1]
+    pos = (p1[0] + (p2[0] - p1[0])*f, p1[1] + (p2[1] - p1[1])*f)
+    dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+    l = (dx*dx + dy*dy)**0.5 or 1.0
+    return pos, (dx/l, dy/l)
 
 # ----------------- 가로형 (1920x1080) 렌더러 -----------------
 def render_frame_landscape(t, total_time=18.0):
@@ -101,43 +117,91 @@ def render_frame_landscape(t, total_time=18.0):
             rel_y = (gy * ah - y1) / ch
             return (int(60 + rel_x * map_w), int(60 + rel_y * map_h))
 
-        # 매끄러운 궤적 드로잉 (st: 0.6s ~ 3.6s)
-        prog = min(1.0, max(0.0, (st - 0.6) / 3.0))
+        # 매끄러운 궤적 드로잉 및 강력한 이동 효과
+        # st: 0.4s ~ 3.8s (3.4초간 이동)
+        prog = min(1.0, max(0.0, (st - 0.4) / 3.4))
+
         if prog > 0:
-            num_pts = int(prog * len(WAYPOINTS))
+            num_pts = int(prog * (len(WAYPOINTS) - 1))
             num_pts = max(1, min(len(WAYPOINTS) - 1, num_pts))
             pts = [to_screen(*WAYPOINTS[i]) for i in range(num_pts + 1)]
 
-            # 1) 어두운 배경 섀도우 라인 (대비 강화)
+            # 1) 어두운 배경 섀도우 라인 (대비 극대화)
             for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=16)
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=22)
 
             # 2) 메인 고시인성 네온 옐로우 라인
             for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=10)
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=14)
 
-            # 3) 중심 하이라이트 코어
+            # 3) 중심 하이라이트 코어 라인
             for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=3)
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=4)
 
-            # 4) 전진하는 헤드 포인터 (이중 펄스 링)
-            head = pts[-1]
-            pulse_sz = 14 + int((st * 8) % 4) * 2
-            draw.ellipse([head[0]-pulse_sz-4, head[1]-pulse_sz-4, head[0]+pulse_sz+4, head[1]+pulse_sz+4], fill=COLOR_PATH_SHADOW)
-            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
-            draw.ellipse([head[0]-5, head[1]-5, head[0]+5, head[1]+5], fill=COLOR_WHITE)
+            # 4) 경로 위를 따라 연속으로 흐르는 전진 화살표 (Flowing Chevrons)
+            num_chevrons = 20
+            for c_idx in range(num_chevrons):
+                c_frac = (c_idx + 1) / (num_chevrons + 1)
+                if c_frac <= prog:
+                    pos_norm, dir_vec = get_path_pos_and_dir(c_frac)
+                    cp = to_screen(*pos_norm)
+                    dx, dy = dir_vec
+                    nx, ny = -dy, dx # 법선 벡터
+
+                    # 흐르는 빛의 파동 (출발 ➔ 도착 방향으로 고속 펄스 이동)
+                    flow_phase = (st * 3.2 - c_frac * 8.0) % 1.0
+                    is_bright = flow_phase < 0.45
+                    arr_fill = (255, 255, 255) if is_bright else COLOR_NAVY
+                    arr_outline = COLOR_PATH_SHADOW if is_bright else COLOR_PATH_NEON
+
+                    tip = (cp[0] + dx * 10, cp[1] + dy * 10)
+                    left = (cp[0] - dx * 7 + nx * 8, cp[1] - dy * 7 + ny * 8)
+                    right = (cp[0] - dx * 7 - nx * 8, cp[1] - dy * 7 - ny * 8)
+                    draw.polygon([tip, left, right], fill=arr_fill, outline=arr_outline)
+
+            # 5) 경로 완성 후 고속 에너지 펄스 주행 (st >= 3.8s)
+            if prog >= 1.0:
+                for pulse_offset in [0.0, 0.5]:
+                    pulse_frac = ((st - 3.8) * 0.9 + pulse_offset) % 1.0
+                    p_pos, _ = get_path_pos_and_dir(pulse_frac)
+                    p_scr = to_screen(*p_pos)
+                    draw.ellipse([p_scr[0]-14, p_scr[1]-14, p_scr[0]+14, p_scr[1]+14], fill=COLOR_PATH_SHADOW)
+                    draw.ellipse([p_scr[0]-10, p_scr[1]-10, p_scr[0]+10, p_scr[1]+10], fill=COLOR_WHITE, outline=COLOR_PATH_NEON, width=3)
+
+            # 6) 선두 이동 유성 헤드 (Comet Head) + 펄스
+            head_norm, _ = get_path_pos_and_dir(prog)
+            head = to_screen(*head_norm)
+
+            # 팽창하는 펄스 글로우 링
+            pulse_sz = 16 + int((st * 10) % 5) * 4
+            draw.ellipse([head[0]-pulse_sz-6, head[1]-pulse_sz-6, head[0]+pulse_sz+6, head[1]+pulse_sz+6], fill=COLOR_PATH_SHADOW)
+            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], outline=COLOR_PATH_NEON, width=3)
+            # 메인 헤드 구체
+            draw.ellipse([head[0]-16, head[1]-16, head[0]+16, head[1]+16], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
+            draw.ellipse([head[0]-7, head[1]-7, head[0]+7, head[1]+7], fill=COLOR_WHITE)
+
+            # 7) 헤드를 따라다니는 이동 가이드 뱃지 (Floating Tooltip)
+            if prog < 0.98:
+                tip_w, tip_h = 170, 46
+                tx = max(70, min(60 + map_w - tip_w - 10, head[0] - tip_w // 2))
+                ty = max(70, head[1] - 68)
+                draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
+                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 외곽 트랙 이동', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
+                draw.polygon([(head[0], head[1]-16), (head[0]-7, ty+tip_h), (head[0]+7, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         # 출발지 핀 (배재 응원석)
         start_pt = to_screen(WAYPOINTS[0][0], WAYPOINTS[0][1])
+        start_pulse = 18 + int((st * 4) % 3) * 6
+        draw.ellipse([start_pt[0]-start_pulse, start_pt[1]-start_pulse, start_pt[0]+start_pulse, start_pt[1]+start_pulse], outline=COLOR_NAVY, width=2)
         draw.ellipse([start_pt[0]-18, start_pt[1]-18, start_pt[0]+18, start_pt[1]+18], fill=COLOR_NAVY, outline=COLOR_WHITE, width=3)
         draw.rounded_rectangle([start_pt[0]-90, start_pt[1]+24, start_pt[0]+90, start_pt[1]+60], radius=8, fill=COLOR_NAVY)
         draw.text((start_pt[0], start_pt[1]+42), '출발: 배재 응원석', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
 
         # 도착지 핀 (맞은편 B출입구)
-        if st > 2.2:
+        if st > 2.0:
             dest_pt = to_screen(WAYPOINTS[-1][0], WAYPOINTS[-1][1])
-            pulse_r = 20 + int((st * 5) % 3) * 8
-            draw.ellipse([dest_pt[0]-pulse_r, dest_pt[1]-pulse_r, dest_pt[0]+pulse_r, dest_pt[1]+pulse_r], outline=COLOR_RED, width=3)
+            pulse_r = 22 + int((st * 6) % 4) * 8
+            draw.ellipse([dest_pt[0]-pulse_r, dest_pt[1]-pulse_r, dest_pt[0]+pulse_r, dest_pt[1]+pulse_r], outline=COLOR_RED, width=4)
             draw.ellipse([dest_pt[0]-18, dest_pt[1]-18, dest_pt[0]+18, dest_pt[1]+18], fill=COLOR_RED, outline=COLOR_WHITE, width=3)
             draw.rounded_rectangle([dest_pt[0]-125, dest_pt[1]-72, dest_pt[0]+125, dest_pt[1]-24], radius=10, fill=COLOR_RED)
             draw.text((dest_pt[0], dest_pt[1]-48), '도착: B출입구 2층 화장실', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
@@ -328,32 +392,84 @@ def render_frame_portrait(t, total_time=18.0):
             rel_y = (gy * ah - y1) / ch
             return (int(40 + rel_x * map_w), int(210 + rel_y * map_h))
 
-        prog = min(1.0, max(0.0, (st - 0.6) / 3.0))
+        # 매끄러운 궤적 드로잉 및 강력한 이동 효과
+        prog = min(1.0, max(0.0, (st - 0.4) / 3.4))
         if prog > 0:
-            num_pts = int(prog * len(WAYPOINTS))
+            num_pts = int(prog * (len(WAYPOINTS) - 1))
             num_pts = max(1, min(len(WAYPOINTS) - 1, num_pts))
             pts = [to_portrait_map(*WAYPOINTS[i]) for i in range(num_pts + 1)]
 
+            # 1) 어두운 배경 섀도우 라인
             for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=16)
-            for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=10)
-            for i in range(len(pts) - 1):
-                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=3)
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_SHADOW, width=22)
 
-            head = pts[-1]
-            pulse_sz = 14 + int((st * 8) % 4) * 2
-            draw.ellipse([head[0]-pulse_sz-4, head[1]-pulse_sz-4, head[0]+pulse_sz+4, head[1]+pulse_sz+4], fill=COLOR_PATH_SHADOW)
-            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
-            draw.ellipse([head[0]-5, head[1]-5, head[0]+5, head[1]+5], fill=COLOR_WHITE)
+            # 2) 메인 고시인성 네온 옐로우 라인
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_NEON, width=14)
+
+            # 3) 중심 하이라이트 코어 라인
+            for i in range(len(pts) - 1):
+                draw.line([pts[i], pts[i+1]], fill=COLOR_PATH_CORE, width=4)
+
+            # 4) 경로 위를 따라 연속으로 흐르는 전진 화살표 (Flowing Chevrons)
+            num_chevrons = 18
+            for c_idx in range(num_chevrons):
+                c_frac = (c_idx + 1) / (num_chevrons + 1)
+                if c_frac <= prog:
+                    pos_norm, dir_vec = get_path_pos_and_dir(c_frac)
+                    cp = to_portrait_map(*pos_norm)
+                    dx, dy = dir_vec
+                    nx, ny = -dy, dx
+
+                    flow_phase = (st * 3.2 - c_frac * 8.0) % 1.0
+                    is_bright = flow_phase < 0.45
+                    arr_fill = (255, 255, 255) if is_bright else COLOR_NAVY
+                    arr_outline = COLOR_PATH_SHADOW if is_bright else COLOR_PATH_NEON
+
+                    tip = (cp[0] + dx * 10, cp[1] + dy * 10)
+                    left = (cp[0] - dx * 7 + nx * 8, cp[1] - dy * 7 + ny * 8)
+                    right = (cp[0] - dx * 7 - nx * 8, cp[1] - dy * 7 - ny * 8)
+                    draw.polygon([tip, left, right], fill=arr_fill, outline=arr_outline)
+
+            # 5) 경로 완성 후 고속 에너지 펄스 주행
+            if prog >= 1.0:
+                for pulse_offset in [0.0, 0.5]:
+                    pulse_frac = ((st - 3.8) * 0.9 + pulse_offset) % 1.0
+                    p_pos, _ = get_path_pos_and_dir(pulse_frac)
+                    p_scr = to_portrait_map(*p_pos)
+                    draw.ellipse([p_scr[0]-14, p_scr[1]-14, p_scr[0]+14, p_scr[1]+14], fill=COLOR_PATH_SHADOW)
+                    draw.ellipse([p_scr[0]-10, p_scr[1]-10, p_scr[0]+10, p_scr[1]+10], fill=COLOR_WHITE, outline=COLOR_PATH_NEON, width=3)
+
+            # 6) 선두 이동 유성 헤드 (Comet Head) + 펄스
+            head_norm, _ = get_path_pos_and_dir(prog)
+            head = to_portrait_map(*head_norm)
+
+            pulse_sz = 16 + int((st * 10) % 5) * 4
+            draw.ellipse([head[0]-pulse_sz-6, head[1]-pulse_sz-6, head[0]+pulse_sz+6, head[1]+pulse_sz+6], fill=COLOR_PATH_SHADOW)
+            draw.ellipse([head[0]-pulse_sz, head[1]-pulse_sz, head[0]+pulse_sz, head[1]+pulse_sz], outline=COLOR_PATH_NEON, width=3)
+            draw.ellipse([head[0]-16, head[1]-16, head[0]+16, head[1]+16], fill=COLOR_PATH_NEON, outline=COLOR_WHITE, width=3)
+            draw.ellipse([head[0]-7, head[1]-7, head[0]+7, head[1]+7], fill=COLOR_WHITE)
+
+            # 7) 플로팅 가이드 뱃지
+            if prog < 0.98:
+                tip_w, tip_h = 160, 44
+                tx = max(50, min(40 + map_w - tip_w - 10, head[0] - tip_w // 2))
+                ty = max(220, head[1] - 65)
+                draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
+                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 외곽 트랙 이동', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
+                draw.polygon([(head[0], head[1]-16), (head[0]-6, ty+tip_h), (head[0]+6, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         start_pt = to_portrait_map(WAYPOINTS[0][0], WAYPOINTS[0][1])
+        start_pulse = 16 + int((st * 4) % 3) * 6
+        draw.ellipse([start_pt[0]-start_pulse, start_pt[1]-start_pulse, start_pt[0]+start_pulse, start_pt[1]+start_pulse], outline=COLOR_NAVY, width=2)
         draw.ellipse([start_pt[0]-16, start_pt[1]-16, start_pt[0]+16, start_pt[1]+16], fill=COLOR_NAVY, outline=COLOR_WHITE, width=3)
         draw.rounded_rectangle([start_pt[0]-80, start_pt[1]+20, start_pt[0]+80, start_pt[1]+55], radius=8, fill=COLOR_NAVY)
         draw.text((start_pt[0], start_pt[1]+37), '배재 응원석', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
 
-        if st > 2.2:
+        if st > 2.0:
             dest_pt = to_portrait_map(WAYPOINTS[-1][0], WAYPOINTS[-1][1])
+            pulse_r = 20 + int((st * 6) % 4) * 8
+            draw.ellipse([dest_pt[0]-pulse_r, dest_pt[1]-pulse_r, dest_pt[0]+pulse_r, dest_pt[1]+pulse_r], outline=COLOR_RED, width=4)
             draw.ellipse([dest_pt[0]-18, dest_pt[1]-18, dest_pt[0]+18, dest_pt[1]+18], fill=COLOR_RED, outline=COLOR_WHITE, width=3)
             draw.rounded_rectangle([dest_pt[0]-120, dest_pt[1]-65, dest_pt[0]+120, dest_pt[1]-20], radius=10, fill=COLOR_RED)
             draw.text((dest_pt[0], dest_pt[1]-42), 'B출입구 2층 화장실', font=get_font(18), fill=COLOR_WHITE, anchor='mm')

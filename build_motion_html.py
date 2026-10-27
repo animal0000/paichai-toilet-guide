@@ -211,6 +211,37 @@ html_code = f'''<!DOCTYPE html>
     // 원본 녹색선을 100% 추적하는 171개 정밀 스무스 웨이포인트
     const WAYPOINTS = {pts_json_str};
 
+    // 누적 거리 계산 및 정밀 보간 유틸리티
+    const pathDists = [0];
+    for (let i = 0; i < WAYPOINTS.length - 1; i++) {{
+      const p1 = WAYPOINTS[i], p2 = WAYPOINTS[i+1];
+      const d = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      pathDists.push(pathDists[pathDists.length - 1] + d);
+    }}
+    const totalPathDist = pathDists[pathDists.length - 1];
+
+    function getPathPosAndDir(frac) {{
+      const targetD = Math.max(0, Math.min(1, frac)) * totalPathDist;
+      let idx = 0;
+      while (idx < pathDists.length - 1 && pathDists[idx+1] < targetD) {{
+        idx++;
+      }}
+      if (idx >= pathDists.length - 1) {{
+        const p1 = WAYPOINTS[WAYPOINTS.length - 2];
+        const p2 = WAYPOINTS[WAYPOINTS.length - 1];
+        const dx = p2.x - p1.x, dy = p2.y - p1.y;
+        const l = Math.hypot(dx, dy) || 1;
+        return {{ pos: WAYPOINTS[WAYPOINTS.length - 1], dir: {{ x: dx/l, y: dy/l }} }};
+      }}
+      const segD = pathDists[idx+1] - pathDists[idx];
+      const f = segD > 0 ? (targetD - pathDists[idx]) / segD : 0;
+      const p1 = WAYPOINTS[idx], p2 = WAYPOINTS[idx+1];
+      const pos = {{ x: p1.x + (p2.x - p1.x) * f, y: p1.y + (p2.y - p1.y) * f }};
+      const dx = p2.x - p1.x, dy = p2.y - p1.y;
+      const l = Math.hypot(dx, dy) || 1;
+      return {{ pos, dir: {{ x: dx/l, y: dy/l }} }};
+    }}
+
     function draw(t) {{
       const w = 1920, h = 1080;
       ctx.clearRect(0, 0, w, h);
@@ -284,15 +315,15 @@ html_code = f'''<!DOCTYPE html>
           return {{ x: 60 + rx * mapW, y: 60 + ry * mapH }};
         }}
 
-        // 초정밀 스무스 네온 라인 드로잉
-        const prog = Math.min(1.0, Math.max(0.0, (st - 0.6) / 3.0));
+        // 초정밀 스무스 네온 라인 드로잉 및 이동 효과 (st: 0.4s ~ 3.8s)
+        const prog = Math.min(1.0, Math.max(0.0, (st - 0.4) / 3.4));
         if (prog > 0) {{
-          const numPts = Math.min(WAYPOINTS.length - 1, Math.max(1, Math.floor(prog * WAYPOINTS.length)));
+          const numPts = Math.min(WAYPOINTS.length - 1, Math.max(1, Math.floor(prog * (WAYPOINTS.length - 1))));
           
           // 1) 그림자 라인
           ctx.beginPath();
-          ctx.strokeStyle = 'rgba(15, 23, 42, 0.8)';
-          ctx.lineWidth = 16;
+          ctx.strokeStyle = 'rgba(10, 15, 30, 0.9)';
+          ctx.lineWidth = 22;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           for (let i = 0; i <= numPts; i++) {{
@@ -305,7 +336,7 @@ html_code = f'''<!DOCTYPE html>
           // 2) 고시인성 네온 옐로우 라인
           ctx.beginPath();
           ctx.strokeStyle = '#FFE600';
-          ctx.lineWidth = 10;
+          ctx.lineWidth = 14;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           for (let i = 0; i <= numPts; i++) {{
@@ -317,8 +348,8 @@ html_code = f'''<!DOCTYPE html>
 
           // 3) 중심 하이라이트 코어
           ctx.beginPath();
-          ctx.strokeStyle = '#FFFFDD';
-          ctx.lineWidth = 3;
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 4;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
           for (let i = 0; i <= numPts; i++) {{
@@ -328,20 +359,95 @@ html_code = f'''<!DOCTYPE html>
           }}
           ctx.stroke();
 
-          // 4) 전진 헤드 펄스
-          const head = toScreen(WAYPOINTS[numPts].x, WAYPOINTS[numPts].y);
-          ctx.fillStyle = '#0F172A';
+          // 4) 경로 위를 연속으로 흐르는 전진 화살표 (Flowing Chevrons)
+          const numChevrons = 20;
+          for (let c = 1; c <= numChevrons; c++) {{
+            const cFrac = c / (numChevrons + 1);
+            if (cFrac <= prog) {{
+              const pData = getPathPosAndDir(cFrac);
+              const cp = toScreen(pData.pos.x, pData.pos.y);
+              const dx = pData.dir.x, dy = pData.dir.y;
+              const nx = -dy, ny = dx;
+
+              const flowPhase = (st * 3.2 - cFrac * 8.0) % 1.0;
+              const isBright = flowPhase < 0.45;
+              ctx.fillStyle = isBright ? '#FFFFFF' : '#1A2F8A';
+              ctx.strokeStyle = isBright ? '#0A0F1E' : '#FFE600';
+              ctx.lineWidth = 2;
+
+              ctx.beginPath();
+              ctx.moveTo(cp.x + dx * 10, cp.y + dy * 10);
+              ctx.lineTo(cp.x - dx * 7 + nx * 8, cp.y - dy * 7 + ny * 8);
+              ctx.lineTo(cp.x - dx * 7 - nx * 8, cp.y - dy * 7 - ny * 8);
+              ctx.closePath();
+              ctx.fill();
+              ctx.stroke();
+            }}
+          }}
+
+          // 5) 경로 완성 후 고속 에너지 펄스 주행 (st >= 3.8s)
+          if (prog >= 1.0) {{
+            [0.0, 0.5].forEach(offset => {{
+              const pFrac = ((st - 3.8) * 0.9 + offset) % 1.0;
+              const pData = getPathPosAndDir(pFrac);
+              const pScr = toScreen(pData.pos.x, pData.pos.y);
+
+              ctx.fillStyle = '#0A0F1E';
+              ctx.beginPath();
+              ctx.arc(pScr.x, pScr.y, 14, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.fillStyle = '#FFFFFF';
+              ctx.strokeStyle = '#FFE600';
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.arc(pScr.x, pScr.y, 10, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.stroke();
+            }});
+          }}
+
+          // 6) 선두 유성 헤드 (Comet Head) + 펄스
+          const headData = getPathPosAndDir(prog);
+          const head = toScreen(headData.pos.x, headData.pos.y);
+
+          const pulseSz = 16 + Math.floor((st * 10) % 5) * 4;
+          ctx.strokeStyle = '#FFE600';
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.arc(head.x, head.y, 18, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.arc(head.x, head.y, pulseSz, 0, Math.PI * 2);
+          ctx.stroke();
 
           ctx.fillStyle = '#FFE600';
           ctx.strokeStyle = '#FFFFFF';
           ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.arc(head.x, head.y, 14, 0, Math.PI * 2);
+          ctx.arc(head.x, head.y, 16, 0, Math.PI * 2);
           ctx.fill();
           ctx.stroke();
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(head.x, head.y, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // 7) 플로팅 가이드 뱃지
+          if (prog < 0.98) {{
+            const tipW = 170, tipH = 46;
+            const tx = Math.max(70, Math.min(60 + mapW - tipW - 10, head.x - tipW / 2));
+            const ty = Math.max(70, head.y - 68);
+            ctx.fillStyle = '#1A2F8A';
+            ctx.strokeStyle = '#FFE600';
+            ctx.lineWidth = 3;
+            roundRect(ctx, tx, ty, tipW, tipH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 17px Pretendard';
+            ctx.textAlign = 'center';
+            ctx.fillText('🚶 외곽 트랙 이동', tx + tipW / 2, ty + 28);
+          }}
         }}
 
         // 출발 핀
@@ -363,8 +469,15 @@ html_code = f'''<!DOCTYPE html>
         ctx.fillText('출발: 배재 응원석', startPt.x, startPt.y + 48);
 
         // 도착 핀
-        if (st > 2.2) {{
+        if (st > 2.0) {{
           const destPt = toScreen(WAYPOINTS[WAYPOINTS.length - 1].x, WAYPOINTS[WAYPOINTS.length - 1].y);
+          const pulseR = 22 + Math.floor((st * 6) % 4) * 8;
+          ctx.strokeStyle = '#C0392B';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(destPt.x, destPt.y, pulseR, 0, Math.PI * 2);
+          ctx.stroke();
+
           ctx.fillStyle = '#C0392B';
           ctx.beginPath();
           ctx.arc(destPt.x, destPt.y, 18, 0, Math.PI * 2);

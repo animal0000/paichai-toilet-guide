@@ -2,7 +2,7 @@ import os
 import sys
 
 sys.path.append('D:/Antigravity/workspace/paichai_toilet_guide/assets')
-from images_b64 import AERIAL_B64, VIEW_B64
+from images_b64 import AERIAL_B64, VIEW_B64, AERIAL_NEON_B64, POSTER_B64
 
 html_content = f'''<!DOCTYPE html>
 <html lang="ko">
@@ -663,18 +663,21 @@ html_content = f'''<!DOCTYPE html>
       </div>
 
       <div class="video-player-box">
-        <video controls playsinline preload="metadata" poster="data:image/jpeg;base64,{VIEW_B64}">
+        <video controls playsinline preload="metadata" poster="data:image/jpeg;base64,{POSTER_B64}">
           <source src="paichai_toilet_guide.mp4" type="video/mp4">
           브라우저가 비디오 재생을 지원하지 않습니다. 아래 다운로드 버튼을 이용하세요.
         </video>
       </div>
 
-      <div class="dl-btn-group">
+      <div class="dl-btn-group" style="grid-template-columns: 1fr 1fr 1fr;">
+        <a class="btn btn-primary" href="motion_graphic.html" target="_blank" style="background: linear-gradient(135deg, #1A2F8A, #1E90FF); border-color: #FFE600;">
+          ⚡ 웹 모션 플레이어 (실시간 무빙)
+        </a>
         <a class="btn btn-primary" href="paichai_toilet_guide.mp4" download="배양전_화장실안내_가로형.mp4">
-          📥 가로형 비디오 다운로드 (16:9 PC/전광판)
+          📥 가로형 비디오 (16:9 PC/전광판)
         </a>
         <a class="btn btn-red" href="paichai_toilet_guide_mobile.mp4" download="배양전_화장실안내_모바일.mp4">
-          📱 세로형 비디오 다운로드 (9:16 스마트폰용)
+          📱 세로형 비디오 (9:16 모바일)
         </a>
       </div>
     </div>
@@ -688,7 +691,7 @@ html_content = f'''<!DOCTYPE html>
         🔄 두 화면 나란히 보기 (기본)
       </button>
       <button class="tab-btn" id="tabBtn1" onclick="switchTab(1)">
-        🗺️ 항공뷰 크게 보기
+        🗺️ 항공뷰 크게 보기 (고시인성 동선)
       </button>
       <button class="tab-btn" id="tabBtn2" onclick="switchTab(2)">
         👀 객석 실사 크게 보기 (파란 박스)
@@ -699,7 +702,7 @@ html_content = f'''<!DOCTYPE html>
     <div class="dual-grid" id="viewCard3" style="display: grid;">
       <div class="view-card" style="margin-bottom: 0;">
         <div class="image-wrapper" onclick="openModal('imgAerialDual')">
-          <img id="imgAerialDual" src="data:image/jpeg;base64,{AERIAL_B64}" alt="항공뷰 전체 동선">
+          <img id="imgAerialDual" src="data:image/jpeg;base64,{AERIAL_NEON_B64}" alt="항공뷰 전체 동선">
           <div class="zoom-hint">🔍 탭하여 확대</div>
         </div>
         <div class="view-caption">
@@ -722,7 +725,7 @@ html_content = f'''<!DOCTYPE html>
     <!-- View 1: Aerial Route (초기 숨김: display: none) -->
     <div class="view-card" id="viewCard1" style="display: none;">
       <div class="image-wrapper" onclick="openModal('imgAerialSingle')">
-        <img id="imgAerialSingle" src="data:image/jpeg;base64,{AERIAL_B64}" alt="효창운동장 항공뷰 이동 동선">
+        <img id="imgAerialSingle" src="data:image/jpeg;base64,{AERIAL_NEON_B64}" alt="효창운동장 항공뷰 이동 동선">
         <div class="zoom-hint">🔍 탭하여 확대 보기</div>
       </div>
       <div class="view-caption">
