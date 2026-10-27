@@ -73,28 +73,44 @@ def create_view_image():
     v_overlay = Image.new('RGBA', (vw, vh), (0, 0, 0, 0))
     v_draw = ImageDraw.Draw(v_overlay)
 
-    # 태양광 패널 출입구 하이라이트 (x: 540~760, y: 440~550)
-    hx1, hy1, hx2, hy2 = 540, 440, 760, 550
-    v_draw.rounded_rectangle([hx1, hy1, hx2, hy2], radius=16, outline=(243, 156, 18, 255), width=6)
-    v_draw.rounded_rectangle([hx1-4, hy1-4, hx2+4, hy2+4], radius=20, outline=(192, 57, 43, 200), width=3)
+    # 사용자가 지정한 파란 박스 정확한 위치: x: 130~350, y: 450~720
+    # 흰 출입구 구조물 (230, 515)~(310, 610)이 박스 안에 완전히 들어감
+    hx1, hy1, hx2, hy2 = 130, 450, 350, 720
 
-    # 지시 말풍선 카드 (위쪽 카드에서 아래 박스로 가리키는 화살표)
-    card_w, card_h = 560, 160
-    card_x = (hx1 + hx2) // 2 - card_w // 2
-    card_y = hy1 - card_h - 40
+    # 파란 박스 + 네온 하이라이트 (영상 STEP 2와 동일한 블루 계열)
+    # 1) 외부 네온 글로우
+    v_draw.rounded_rectangle([hx1-6, hy1-6, hx2+6, hy2+6], radius=16, outline=(26, 115, 232, 180), width=4)
+    # 2) 메인 파란 박스
+    v_draw.rounded_rectangle([hx1, hy1, hx2, hy2], radius=12, outline=(30, 144, 255, 255), width=7)
+    # 3) 내부 골드 액센트 라인
+    v_draw.rounded_rectangle([hx1+6, hy1+6, hx2-6, hy2-6], radius=8, outline=(243, 156, 18, 220), width=2)
 
-    v_draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=20, fill=(17, 24, 39, 245), outline=(243, 156, 18, 255), width=4)
-    arrow_mid = (hx1 + hx2) // 2
-    v_draw.polygon([(arrow_mid - 25, card_y + card_h), (arrow_mid + 25, card_y + card_h), (arrow_mid, hy1 - 6)], fill=(243, 156, 18, 255))
+    # 출입구 라벨 뱃지 (박스 바로 위)
+    badge_w, badge_h = 240, 46
+    bx_mid = (hx1 + hx2) // 2
+    v_draw.rounded_rectangle([bx_mid - badge_w//2, hy1 - 60, bx_mid + badge_w//2, hy1 - 14], radius=10, fill=(30, 144, 255, 245), outline=(255, 255, 255, 255), width=2)
+    v_draw.text((bx_mid, hy1 - 37), 'B출입구 (입구 계단)', font=get_font(20), fill=(255, 255, 255, 255), anchor='mm')
 
-    # 카드 텍스트 (이모지 📍, ☀️, 👉 제거 및 맑은 고딕 호환 텍스트)
-    v_draw.text((card_x + card_w//2, card_y + 35), '맞은편 B출입구 (화장실 진입구)', font=get_font(26), fill=(255, 215, 0, 255), anchor='mm')
-    v_draw.text((card_x + card_w//2, card_y + 80), '지붕 위 [태양광 패널] 아래 출입 계단', font=get_font(21), fill=(255, 255, 255, 255), anchor='mm')
-    v_draw.text((card_x + card_w//2, card_y + 122), '출입문 진입 후 【 오른쪽 2층 】 화장실', font=get_font(20), fill=(100, 230, 150, 255), anchor='mm')
+    # 가이드 말풍선 카드 (박스 우측 상단 공간: x: 380~1020, y: 450~620)
+    card_x = 380
+    card_y = 450
+    card_w = 640
+    card_h = 170
 
-    # 하단 캡션 바
+    v_draw.rounded_rectangle([card_x, card_y, card_x + card_w, card_y + card_h], radius=18, fill=(15, 23, 42, 245), outline=(30, 144, 255, 255), width=3)
+
+    # 연결 지시선 (카드 좌측에서 파란 박스로 향하는 포인터 선)
+    v_draw.line([(card_x, card_y + 40), (hx2 + 10, hy1 + 40)], fill=(30, 144, 255, 255), width=4)
+    v_draw.polygon([(hx2 + 8, hy1 + 35), (hx2 + 8, hy1 + 45), (hx2, hy1 + 40)], fill=(30, 144, 255, 255))
+
+    # 카드 텍스트 (이모지 없이 맑은 고딕 호환 텍스트)
+    v_draw.text((card_x + card_w//2, card_y + 36), '맞은편 B출입구 (화장실 진입구)', font=get_font(25), fill=(255, 215, 0, 255), anchor='mm')
+    v_draw.text((card_x + card_w//2, card_y + 82), '지붕 위 [태양광 패널] 아래 출입 계단', font=get_font(21), fill=(255, 255, 255, 255), anchor='mm')
+    v_draw.text((card_x + card_w//2, card_y + 128), '출입문 진입 후 【 오른쪽 2층 】 화장실', font=get_font(22), fill=(46, 204, 113, 255), anchor='mm')
+
+    # 하단 캡션 바 (파란 박스 = B출입구 명기)
     v_draw.rounded_rectangle([30, vh - 110, vw - 30, vh - 30], radius=16, fill=(26, 47, 138, 240), outline=(255, 255, 255, 255), width=2)
-    v_draw.text((vw//2, vh - 70), '※ 배재 응원석(객석)에서 정면으로 보이는 실제 전경', font=get_font(22), fill=(255, 255, 255, 255), anchor='mm')
+    v_draw.text((vw//2, vh - 70), '※ 배재 응원석(객석)에서 정면으로 보이는 실제 전경 (파란 박스 = B출입구)', font=get_font(22), fill=(255, 255, 255, 255), anchor='mm')
 
     final_view = Image.alpha_composite(im_view, v_overlay).convert('RGB')
     out_annotated = os.path.join(ASSETS_DIR, 'view_annotated.jpg')

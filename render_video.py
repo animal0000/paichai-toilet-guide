@@ -571,6 +571,9 @@ def render_video(out_path, mode='landscape'):
         'ffmpeg', '-y', '-f', 'rawvideo', '-vcodec', 'rawvideo',
         '-s', f'{w}x{h}', '-pix_fmt', 'rgb24', '-r', str(fps),
         '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
+        '-profile:v', 'high', '-level', '4.1',
+        '-g', '30', '-keyint_min', '30',
+        '-movflags', '+faststart',
         '-preset', 'fast', '-crf', '20', out_path
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
