@@ -47,7 +47,7 @@ html_content = f'''<!DOCTYPE html>
     }}
 
     .container {{
-      max-width: 900px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 16px;
     }}
@@ -331,6 +331,7 @@ html_content = f'''<!DOCTYPE html>
       line-height: 1.5;
     }}
 
+    /* Dual Grid (Side-by-Side: Default View) */
     .dual-grid {{
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -678,24 +679,50 @@ html_content = f'''<!DOCTYPE html>
       </div>
     </div>
 
-    <!-- 3. [최상단 배치 2] 시각 동선 가이드 이미지 (조감도 & 현장 실사) -->
+    <!-- 3. [최상단 배치 2] 시각 동선 가이드 (기본: 두 화면 나란히 보기) -->
     <div class="section-title">시각 동선 가이드 (조감도 & 현장 실사)</div>
 
+    <!-- Tab Bar: [두 화면 나란히 보기]가 첫 번째이자 기본 active -->
     <div class="tab-bar">
-      <button class="tab-btn active" id="tabBtn1" onclick="switchTab(1)">
-        🗺️ STEP 1. 항공뷰 전체 동선
+      <button class="tab-btn active" id="tabBtn3" onclick="switchTab(3)">
+        🔄 두 화면 나란히 보기 (기본)
+      </button>
+      <button class="tab-btn" id="tabBtn1" onclick="switchTab(1)">
+        🗺️ 항공뷰 크게 보기
       </button>
       <button class="tab-btn" id="tabBtn2" onclick="switchTab(2)">
-        👀 STEP 2. 객석 정면 실사 뷰 (파란 박스)
-      </button>
-      <button class="tab-btn" id="tabBtn3" onclick="switchTab(3)">
-        🔄 두 화면 나란히 보기
+        👀 객석 실사 크게 보기 (파란 박스)
       </button>
     </div>
 
-    <div class="view-card" id="viewCard1">
-      <div class="image-wrapper" onclick="openModal('imgAerial')">
-        <img id="imgAerial" src="data:image/jpeg;base64,{AERIAL_B64}" alt="효창운동장 항공뷰 이동 동선">
+    <!-- View 3: Dual Grid View (기본 노출 상태: display: grid) -->
+    <div class="dual-grid" id="viewCard3" style="display: grid;">
+      <div class="view-card" style="margin-bottom: 0;">
+        <div class="image-wrapper" onclick="openModal('imgAerialDual')">
+          <img id="imgAerialDual" src="data:image/jpeg;base64,{AERIAL_B64}" alt="항공뷰 전체 동선">
+          <div class="zoom-hint">🔍 탭하여 확대</div>
+        </div>
+        <div class="view-caption">
+          <div class="caption-title">STEP 1. 외곽 이동 동선 (도보 2~3분)</div>
+          <div class="caption-text">배재 응원석(남측) 우측 출구 ➔ 동측 외곽 트랙 통로 ➔ 북측 B출입구</div>
+        </div>
+      </div>
+      <div class="view-card" style="margin-bottom: 0;">
+        <div class="image-wrapper" onclick="openModal('imgViewDual')">
+          <img id="imgViewDual" src="data:image/jpeg;base64,{VIEW_B64}" alt="객석 정면 실사 뷰 (파란 박스 B출입구)">
+          <div class="zoom-hint">🔍 탭하여 확대</div>
+        </div>
+        <div class="view-caption">
+          <div class="caption-title">STEP 2. B출입구 실사 [파란 박스 계단]</div>
+          <div class="caption-text">태양광 패널 아래 파란 박스 출입구 계단 진입 ➔ 【우측 2층】 화장실</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 1: Aerial Route (초기 숨김: display: none) -->
+    <div class="view-card" id="viewCard1" style="display: none;">
+      <div class="image-wrapper" onclick="openModal('imgAerialSingle')">
+        <img id="imgAerialSingle" src="data:image/jpeg;base64,{AERIAL_B64}" alt="효창운동장 항공뷰 이동 동선">
         <div class="zoom-hint">🔍 탭하여 확대 보기</div>
       </div>
       <div class="view-caption">
@@ -706,38 +733,16 @@ html_content = f'''<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- View 2: Field View (초기 숨김: display: none) -->
     <div class="view-card" id="viewCard2" style="display: none;">
-      <div class="image-wrapper" onclick="openModal('imgView')">
-        <img id="imgView" src="data:image/jpeg;base64,{VIEW_B64}" alt="객석에서 바라본 B출입구 화장실 입구 전경">
+      <div class="image-wrapper" onclick="openModal('imgViewSingle')">
+        <img id="imgViewSingle" src="data:image/jpeg;base64,{VIEW_B64}" alt="객석에서 바라본 B출입구 화장실 입구 전경">
         <div class="zoom-hint">🔍 탭하여 확대 보기</div>
       </div>
       <div class="view-caption">
         <div class="caption-title">👀 배재 응원석에서 정면을 바라보았을 때의 실제 시야 (파란 박스 = B출입구)</div>
         <div class="caption-text">
           맞은편 스탠드 좌측 <strong>[태양광 패널 아래 파란 박스로 표시된 B출입구 계단]</strong>으로 진입하세요. 출입구 안으로 들어가서 <strong>【오른쪽 2층】</strong>에 학생 화장실이 위치합니다.
-        </div>
-      </div>
-    </div>
-
-    <div class="dual-grid" id="viewCard3" style="display: none;">
-      <div class="view-card" style="margin-bottom: 0;">
-        <div class="image-wrapper" onclick="openModal('imgAerial')">
-          <img src="data:image/jpeg;base64,{AERIAL_B64}" alt="항공뷰 조감도">
-          <div class="zoom-hint">🔍 확대</div>
-        </div>
-        <div class="view-caption">
-          <div class="caption-title">STEP 1. 외곽 동선</div>
-          <div class="caption-text">응원석 ➔ 동측 트랙 ➔ B출입구</div>
-        </div>
-      </div>
-      <div class="view-card" style="margin-bottom: 0;">
-        <div class="image-wrapper" onclick="openModal('imgView')">
-          <img src="data:image/jpeg;base64,{VIEW_B64}" alt="현장 실사 뷰">
-          <div class="zoom-hint">🔍 확대</div>
-        </div>
-        <div class="view-caption">
-          <div class="caption-title">STEP 2. 파란 박스 출입구</div>
-          <div class="caption-text">파란 박스 계단 ➔ 우측 2층</div>
         </div>
       </div>
     </div>
@@ -845,13 +850,13 @@ html_content = f'''<!DOCTYPE html>
 
   <script>
     function switchTab(idx) {{
+      document.getElementById('tabBtn3').classList.toggle('active', idx === 3);
       document.getElementById('tabBtn1').classList.toggle('active', idx === 1);
       document.getElementById('tabBtn2').classList.toggle('active', idx === 2);
-      document.getElementById('tabBtn3').classList.toggle('active', idx === 3);
 
+      document.getElementById('viewCard3').style.display = (idx === 3) ? 'grid' : 'none';
       document.getElementById('viewCard1').style.display = (idx === 1) ? 'block' : 'none';
       document.getElementById('viewCard2').style.display = (idx === 2) ? 'block' : 'none';
-      document.getElementById('viewCard3').style.display = (idx === 3) ? 'grid' : 'none';
     }}
 
     function openModal(imgId) {{
@@ -878,4 +883,4 @@ out_path = 'D:/Antigravity/workspace/paichai_toilet_guide/index.html'
 with open(out_path, 'w', encoding='utf-8') as f:
     f.write(html_content)
 
-print(f'index.html rebuilt with TOP Video & Image placement: {out_path} ({os.path.getsize(out_path)//1024} KB)')
+print(f'index.html updated (default dual-grid): {out_path} ({os.path.getsize(out_path)//1024} KB)')
