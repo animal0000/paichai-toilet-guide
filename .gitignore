@@ -16,3 +16,5 @@ assets/*mask*.jpg
 assets/test_*.jpg
 
 assets/debug_frames/
+
+assets/capture_*.jpg

@@ -706,8 +706,8 @@ html_content = f'''<!DOCTYPE html>
           <div class="zoom-hint">🔍 탭하여 확대</div>
         </div>
         <div class="view-caption">
-          <div class="caption-title">STEP 1. 외곽 이동 동선 (도보 2~3분)</div>
-          <div class="caption-text">배재 응원석(남측) 우측 출구 ➔ 동측 외곽 트랙 통로 ➔ 북측 B출입구</div>
+          <div class="caption-title">STEP 1. 관객석 상단 통로 동선 (도보 약 2~3분)</div>
+          <div class="caption-text">배재 응원석(남측) ➔ 관객석 상단 통로(오른쪽·반시계 방향) ➔ 북측 B출입구</div>
         </div>
       </div>
       <div class="view-card" style="margin-bottom: 0;">
@@ -731,7 +731,7 @@ html_content = f'''<!DOCTYPE html>
       <div class="view-caption">
         <div class="caption-title">🗺️ 효창운동장 전체 이동 동선 (도보 약 2~3분)</div>
         <div class="caption-text">
-          하단 <strong>[배재 응원석 (파란 박스)]</strong> 우측 출구로 나와서 동쪽 외곽 곡선 통로(녹색 화살표)를 따라 반시계 방향으로 이동하면 맞은편 <strong>[B출입구 (빨간 원)]</strong>에 도착합니다.
+          하단 <strong>[배재 응원석 (파란 박스)]</strong>에서 관객석 상단 통로로 올라가, 통로(녹색 화살표)를 따라 오른쪽(반시계 방향)으로 이동하면 맞은편 <strong>[B출입구 (빨간 원)]</strong>에 도착합니다. 경기장 밖으로 나가지 않습니다.
         </div>
       </div>
     </div>
@@ -777,11 +777,11 @@ html_content = f'''<!DOCTYPE html>
         <div class="step-num">01</div>
         <div class="step-content">
           <div class="step-title">
-            응원석 우측 계단으로 이동
+            관객석 상단 통로로 올라가기
             <span class="step-tag">출발</span>
           </div>
           <div class="step-desc">
-            배재 응원석 우측 통로를 이용해 안전하게 이동합니다. <strong>하프타임 시작 직후는 혼잡</strong>하므로 쉬는 시간 5분 전 또는 경기 진행 중 미리 이용하는 것을 추천합니다.
+            배재 응원석에서 관객석 상단 통로로 안전하게 올라갑니다. <strong>하프타임 시작 직후는 혼잡</strong>하므로 쉬는 시간 5분 전 또는 경기 진행 중 미리 이용하는 것을 추천합니다.
           </div>
         </div>
       </div>
@@ -790,11 +790,11 @@ html_content = f'''<!DOCTYPE html>
         <div class="step-num">02</div>
         <div class="step-content">
           <div class="step-title">
-            동측 외곽 통로를 따라 이동
-            <span class="step-tag">도보 2분</span>
+            상단 통로를 따라 이동
+            <span class="step-tag">도보 약 2~3분</span>
           </div>
           <div class="step-desc">
-            트랙 외곽 보행 통로를 따라 맞은편 북측 스탠드로 이동합니다. <strong>경기장 필드(잔디) 및 러닝 트랙 침범은 엄격히 금지</strong>됩니다.
+            관객석 상단 통로를 따라 오른쪽(반시계 방향)으로 돌아 맞은편 북측 스탠드로 이동합니다. <strong>경기장 필드(잔디) 및 러닝 트랙 침범은 엄격히 금지</strong>됩니다.
           </div>
         </div>
       </div>
@@ -831,7 +831,7 @@ html_content = f'''<!DOCTYPE html>
       <div class="alert-title">⚠️ 배양전 관람 학생 안전 및 질서 수칙</div>
       <ul class="alert-list">
         <li><strong>상대 학교(양정) 응원 구역 진입 금지:</strong> 불필요한 마찰을 방지하기 위해 지정된 배재 학생 이동 동선을 엄수해 주십시오.</li>
-        <li><strong>경기장 그라운드 잔디 침범 절대 금지:</strong> 원활한 경기 진행을 위해 외곽 통로로만 보행합니다.</li>
+        <li><strong>경기장 그라운드 잔디 침범 절대 금지:</strong> 원활한 경기 진행을 위해 관객석 통로로만 보행합니다.</li>
         <li><strong>화장실 이용 대기 시 1줄 서기:</strong> 혼잡 시 안전 요원(학생회 및 인솔 교사)의 안내에 적극 협조해 주십시오.</li>
         <li><strong>비상 상황 발생 시:</strong> 주변 인솔 교사 또는 진행 본부 안내 데스크로 즉시 연락 바랍니다.</li>
       </ul>

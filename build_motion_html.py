@@ -433,7 +433,7 @@ html_code = f'''<!DOCTYPE html>
 
           // 7) 플로팅 가이드 뱃지
           if (prog < 0.98) {{
-            const tipW = 170, tipH = 46;
+            const tipW = 185, tipH = 46;
             const tx = Math.max(70, Math.min(60 + mapW - tipW - 10, head.x - tipW / 2));
             const ty = Math.max(70, head.y - 68);
             ctx.fillStyle = '#1A2F8A';
@@ -446,7 +446,7 @@ html_code = f'''<!DOCTYPE html>
             ctx.fillStyle = '#FFFFFF';
             ctx.font = 'bold 17px Pretendard';
             ctx.textAlign = 'center';
-            ctx.fillText('🚶 외곽 트랙 이동', tx + tipW / 2, ty + 28);
+            ctx.fillText('🚶 관객석 상단 통로', tx + tipW / 2, ty + 28);
           }}
         }}
 
@@ -511,8 +511,8 @@ html_code = f'''<!DOCTYPE html>
         ctx.fillText('효창운동장 전체 동선', px + 290, 180);
 
         const items = [
-          ['① 출발', '배재 응원석 우측 계단으로 이동'],
-          ['② 이동', '동측 외곽 트랙으로 이동 (도보 2~3분)'],
+          ['① 출발', '관객석 상단 통로로 올라가기'],
+          ['② 이동', '상단 통로 따라 반시계 방향 이동 (도보 약 2~3분)'],
           ['③ 진입', '맞은편 태양광 패널 아래 B출입구 (파란 박스)'],
           ['④ 이용', '출입구 진입 후 오른쪽 2층 화장실']
         ];

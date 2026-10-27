@@ -182,11 +182,11 @@ def render_frame_landscape(t, total_time=18.0):
 
             # 7) 헤드를 따라다니는 이동 가이드 뱃지 (Floating Tooltip)
             if prog < 0.98:
-                tip_w, tip_h = 170, 46
+                tip_w, tip_h = 185, 46
                 tx = max(70, min(60 + map_w - tip_w - 10, head[0] - tip_w // 2))
                 ty = max(70, head[1] - 68)
                 draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
-                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 외곽 트랙 이동', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
+                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 관객석 상단 통로', font=get_font(17), fill=COLOR_WHITE, anchor='mm')
                 draw.polygon([(head[0], head[1]-16), (head[0]-7, ty+tip_h), (head[0]+7, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         # 출발지 핀 (배재 응원석)
@@ -212,8 +212,8 @@ def render_frame_landscape(t, total_time=18.0):
         draw.text((px + 290, 180), '효창운동장 전체 동선', font=get_font(38), fill=COLOR_WHITE, anchor='mm')
 
         items = [
-            ('① 출발', '배재 응원석 우측 계단으로 이동'),
-            ('② 이동', '동측 외곽 트랙을 따라 반시계 방향 이동 (도보 2~3분)'),
+            ('① 출발', '관객석 상단 통로로 올라가기'),
+            ('② 이동', '상단 통로를 따라 반시계 방향 이동 (도보 약 2~3분)'),
             ('③ 진입', '맞은편 태양광 패널 아래 B출입구 (파란 박스)'),
             ('④ 이용', '출입구 진입 후 오른쪽 2층 화장실')
         ]
@@ -371,7 +371,7 @@ def render_frame_portrait(t, total_time=18.0):
 
         draw.rounded_rectangle([40, 60, w-40, 180], radius=20, fill=COLOR_NAVY, outline=COLOR_GOLD, width=2)
         draw.text((w//2, 100), 'STEP 1: 효창운동장 전체 이동 동선', font=get_font(34), fill=COLOR_WHITE, anchor='mm')
-        draw.text((w//2, 145), '응원석 우측 ➔ 외곽 트랙을 따라 맞은편 B출입구로 이동', font=get_font(22, False), fill=COLOR_GOLD, anchor='mm')
+        draw.text((w//2, 145), '응원석 ➔ 관객석 상단 통로를 따라 맞은편 B출입구로 이동', font=get_font(22, False), fill=COLOR_GOLD, anchor='mm')
 
         map_w, map_h = 1000, 1000
         zoom = 1.0 + (st / 5.5) * 0.15
@@ -452,11 +452,11 @@ def render_frame_portrait(t, total_time=18.0):
 
             # 7) 플로팅 가이드 뱃지
             if prog < 0.98:
-                tip_w, tip_h = 160, 44
+                tip_w, tip_h = 175, 44
                 tx = max(50, min(40 + map_w - tip_w - 10, head[0] - tip_w // 2))
                 ty = max(220, head[1] - 65)
                 draw.rounded_rectangle([tx, ty, tx + tip_w, ty + tip_h], radius=10, fill=COLOR_NAVY, outline=COLOR_PATH_NEON, width=3)
-                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 외곽 트랙 이동', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
+                draw.text((tx + tip_w//2, ty + tip_h//2), '🚶 관객석 상단 통로', font=get_font(16), fill=COLOR_WHITE, anchor='mm')
                 draw.polygon([(head[0], head[1]-16), (head[0]-6, ty+tip_h), (head[0]+6, ty+tip_h)], fill=COLOR_PATH_NEON)
 
         start_pt = to_portrait_map(WAYPOINTS[0][0], WAYPOINTS[0][1])
@@ -476,8 +476,8 @@ def render_frame_portrait(t, total_time=18.0):
 
         draw.rounded_rectangle([40, 1240, w-40, 1850], radius=24, fill=COLOR_NAVY, outline=COLOR_GOLD, width=3)
         card_items = [
-            ('① 출발', '응원석 우측 계단으로 이동'),
-            ('② 이동', '동측 외곽 통로로 반시계 방향 이동 (도보 2~3분)'),
+            ('① 출발', '관객석 상단 통로로 올라가기'),
+            ('② 이동', '상단 통로를 따라 반시계 방향 이동 (도보 약 2~3분)'),
             ('③ 진입', '맞은편 태양광 패널 아래 B출입구 (파란 박스)'),
             ('④ 화장실', '출입문 안쪽 [오른쪽 2층] 화장실 이용')
         ]
